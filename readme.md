@@ -39,7 +39,7 @@ roslaunch vista_gazebo vista_gazebo vistar_simulation.launch
 ```
 roslaunch vistar_moveit_config demo.launch
 ```
-## Problem for your help
+## Problems for your help
 1. robotiq in gazeo which is not full and the error with joints has solved
 --
 2. robotiq gripper in moveit can plan and excute now
