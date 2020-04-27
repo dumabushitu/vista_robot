@@ -14,25 +14,25 @@ roslaunch ur3_description view_ur3.launch
 ```
 - view ur3_with_robotiq
 ```
-roslaunch vista_description view_vistar.launch 
+roslaunch vistar_description view_vistar.launch 
 ```
 2. see robot model in gazebo
 ---
 - view robotiq
 ```
-roslaunch vista_gazebo robotiq.launch
+roslaunch vistar_gazebo robotiq.launch
 ```
 - view ur3
 ```
-roslaunch vista_gazebo ur3.launch
+roslaunch vistar_gazebo ur3.launch
 ```
 - view vistar
 ```
-roslaunch vista_gazebo vistar.launch
+roslaunch vistar_gazebo vistar.launch
 ```
 - view vistar simulation
 ```
-roslaunch vista_gazebo vista_gazebo vistar_simulation.launch
+roslaunch vistar_gazebo  vistar_simulation.launch
 ```
 3. see robot moveit demo
 ---
