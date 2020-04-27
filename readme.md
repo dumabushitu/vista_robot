@@ -53,7 +53,7 @@ the camera has its link.
 
 - table and the cube_marker : i dont send them to the parameter but spawn them in gazebo directly.
 
-**you can see the launch file in vistar_gazebo/vistar_simulation.launch for more details.**
+**you can see the [vistar_simulation.launch file ]( ./vistar_gazebo/vistar_simulation.launch)for more details.**
 
 4. I can't see artag in rviz when I run the vistar simulation and ar_track_alvar  nomatter i use kinect or usb camera in gazebo. i dont know what'wrong after i had tried many times in some ways.
 --
