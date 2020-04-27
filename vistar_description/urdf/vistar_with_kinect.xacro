@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro" name="vistar">
+
+	<!-- THE ROBOT -->
+	<link name="world" />
+
+	<!-- UR from ROS-i repos -->
+	<xacro:include filename="$(find ur3_description)/urdf/ur3.urdf.xacro" />
+	<joint name="world_joint" type="fixed">
+		<parent link="world" />
+		<child link = "base_link" />
+		<origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+	</joint>
+	<xacro:ur3_robot prefix="" joint_limited="false"/>
+
+	<!-- Robotiq from Beta Robots fork-->
+	<xacro:include filename="$(find robotiq_2f_85_gripper_description)/urdf/robotiq_2f_85.urdf.xacro" />
+	<xacro:robotiq_2f_85 name="gripper" parent="ee_link" precise_collision="false" adaptive_transmission="false">
+		<origin xyz="0 0 0" rpy="${pi/2} ${pi/2} ${pi/2}" />
+	</xacro:robotiq_2f_85>
+
+	<!-- kinect -->
+	<xacro:include filename="$(find vistar_gazebo)/models/kinect/kinect.xacro"/>
+	<xacro:kinect_camera prefix="camera" parent="world" >
+		<origin xyz="0.8 0.7 0.03" rpy="0 0 ${pi}" />
+	</xacro:kinect_camera>
+       <!-- Plugin -->
+  	<gazebo>
+    <plugin name="ros_control" filename="libgazebo_ros_control.so">
+      <!--robotNamespace>/</robotNamespace-->
+      <!--robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType-->
+    </plugin>
+	</gazebo>
+
+</robot>

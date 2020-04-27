@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>vistar_gazebo</name>
+  <version>1.2.7</version>
+  <description>
+      Gazebo wrapper for the Universal UR3 robot arm, robotiq and ur3_with_robotiq.
+  </description>
+
+
+  <author>dumabushitu</author>
+
+  <maintainer email="dumabushitu@gmail.com">dumabushitu</maintainer>
+
+  <license>BSD</license>
+
+  <url type="website">http://ros.org/wiki/ur_gazebo</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <test_depend>roslaunch</test_depend>
+  <exec_depend>controller_manager</exec_depend>
+  <exec_depend>effort_controllers</exec_depend>
+  <exec_depend>gazebo_ros</exec_depend>
+  <exec_depend>gazebo_ros_control</exec_depend>
+  <exec_depend>joint_state_controller</exec_depend>
+  <exec_depend>joint_trajectory_controller</exec_depend>
+  <exec_depend>position_controllers</exec_depend>
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rostopic</exec_depend>
+  <exec_depend>vistar_description</exec_depend>
+  <exec_depend>rviz</exec_depend>
+  <exec_depend>urdf</exec_depend>
+  <exec_depend>xacro</exec_depend>
+
+  <export>
+  </export>
+</package>
