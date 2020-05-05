@@ -523,7 +523,7 @@
           <geometry>
             <mesh>
               <uri>model://aruco_cube/meshes/aruco_cube_5cm.dae</uri>
-              <scale>1 1 2</scale>
+              <scale>1 1 2.8</scale>
             </mesh>
           </geometry>
         </visual>
@@ -536,18 +536,18 @@
         <gravity>1</gravity>
         <enable_wind>0</enable_wind>
       </link>
-      <pose frame=''>0.876948 0.489466 0 0 -0 0</pose>
+      <pose frame=''>0.21061 0.655057 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>72 397000000</sim_time>
-      <real_time>75 81009001</real_time>
-      <wall_time>1588573155 731064608</wall_time>
-      <iterations>72397</iterations>
+      <sim_time>94 304000000</sim_time>
+      <real_time>40 861209403</real_time>
+      <wall_time>1588657135 328626626</wall_time>
+      <iterations>27458</iterations>
       <model name='aruco_cube'>
-        <pose frame=''>0.346926 0.482821 1.06338 -0.000351 2e-06 0</pose>
+        <pose frame=''>0.35146 0.518457 1.0635 -0.001134 0.000122 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>0.346926 0.482821 1.06338 -0.000351 2e-06 0</pose>
+          <pose frame=''>0.35146 0.518457 1.0635 -0.001134 0.000122 0</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 -0 -1e-06 0 0</acceleration>
           <wrench>0 0 -0 0 -0 0</wrench>
@@ -589,7 +589,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>0.539896 0.072348 3.49653 0 1.35564 1.5642</pose>
+        <pose frame=''>0.271092 0.110841 4.01442 0 1.43164 1.8122</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>

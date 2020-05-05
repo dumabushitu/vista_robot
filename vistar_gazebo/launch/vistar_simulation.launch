@@ -20,7 +20,7 @@
     <arg name="with_camera" value="$(arg with_camera)"/>
    </include>
     <!-- push robot_description to factory and spawn robot in gazebo -->
-  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -x 0.375 " respawn="false" output="screen" />
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot " respawn="false" output="screen" />
 
   <include file="$(find vistar_gazebo)/launch/controller_utils.launch"/>
 

@@ -141,7 +141,20 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/pick_and_place_node.cpp)
+add_executable(pick_place_node src/pick_place.cpp)
+target_link_libraries(pick_place_node ${catkin_LIBRARIES})
+
+add_executable(pick_place_1_node src/pick_place.1.cpp)
+target_link_libraries(pick_place_1_node ${catkin_LIBRARIES})
+
+add_executable(pick_place_2_node src/pick_place.2.cpp)
+target_link_libraries(pick_place_2_node ${catkin_LIBRARIES})
+
+add_executable(test_random_node src/test_random.cpp)
+target_link_libraries(test_random_node ${catkin_LIBRARIES})
+
+add_executable(test_custom_node src/test_custom.cpp)
+target_link_libraries(test_custom_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

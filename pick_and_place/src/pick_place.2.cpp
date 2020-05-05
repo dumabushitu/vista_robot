@@ -4,29 +4,24 @@
 #include <visualization_msgs/Marker.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <geometry_msgs/Pose.h>
-
-geometry_msgs::Pose marker_pose;
-
-          
-
-void markerCallback(const visualization_msgs::Marker &msg)
-{
-    marker_pose.position.x= msg.pose.position.x;
-    marker_pose.position.y= msg.pose.position.y;
-    marker_pose.position.z= msg.pose.position.z;
-
-    marker_pose.orientation.x = msg.pose.orientation.x;
-    marker_pose.orientation.y = msg.pose.orientation.y;
-    marker_pose.orientation.z = msg.pose.orientation.z;
-    marker_pose.orientation.w = msg.pose.orientation.w;
-}
+#include <tf/transform_listener.h>
 
 
 void prepare(moveit::planning_interface::MoveGroupInterface& move_group)
 {
-  move_group.setNamedTarget("prepare");
-  move_group.move();
-  ros::WallDuration(1.0).sleep();
+      if(move_group.setNamedTarget ("prepare"))
+
+      {
+
+        ROS_INFO("setNamedTarget Success!");
+
+        move_group.move();
+
+      }
+
+    else
+
+      ROS_INFO("setNamedTarget failed!");
 
 }
 
@@ -44,7 +39,7 @@ void closedGripper(moveit::planning_interface::MoveGroupInterface& group)
     ros::WallDuration(1.0).sleep(); 
 }
 
-void pick(moveit::planning_interface::MoveGroupInterface& move_group)
+void pick(moveit::planning_interface::MoveGroupInterface& move_group,const geometry_msgs::Pose &marker_pose)
 {
   // 创建一个抓取向量，这里只创建一个抓取
   std::vector<moveit_msgs::Grasp> grasps;
@@ -131,7 +126,7 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   group.place("cube_marker", place_location);
 }
 
-void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& planning_scene)
+void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& planning_scene, const geometry_msgs::Pose &marker_pose)
 {
 
   // 添加桌子和物块
@@ -218,21 +213,45 @@ int main(int argc, char** argv)
   ros::AsyncSpinner spinner(2);
   spinner.start();
 
+
   moveit::planning_interface::PlanningSceneInterface planning_scene;
   moveit::planning_interface::MoveGroupInterface arm_group("arm");
   arm_group.setPlanningTime(45.0);
 
   prepare(arm_group);
+  
+  ros::WallDuration(1.0).sleep();
+  
+  tf::TransformListener listener;
+  tf::StampedTransform transform;
+  while (nh.ok()) {
+    try{
+      listener.lookupTransform("base_link", "marker_frame",ros::Time(0), transform);
+      break;
+    }
+    catch (tf::TransformException ex){
+      ROS_INFO("Waiting for transform between 'base_link' and 'marker_frame'");
+      ros::Duration(1.0).sleep();
+    }
+  }
+  ROS_INFO("Found transform between 'base_link' and 'marker_frame'");
 
+    geometry_msgs::Pose marker_pose;
+    marker_pose.position.x= transform.getOrigin().x();
+    marker_pose.position.y= transform.getOrigin().y();
+    marker_pose.position.z= transform.getOrigin().z();
 
-  ros::Subscriber sub = nh.subscribe("aruco_single/marker", 10, markerCallback);
+    marker_pose.orientation.x = transform.getRotation().getX();
+    marker_pose.orientation.y = transform.getRotation().getY();
+    marker_pose.orientation.z = transform.getRotation().getZ();
+    marker_pose.orientation.w = transform.getRotation().getW();
 
-  addCollisionObjects(planning_scene);
+  addCollisionObjects(planning_scene, marker_pose);
 
   // 等待场景初始化
   ros::WallDuration(1.0).sleep();
 
-  pick(arm_group);
+  pick(arm_group, marker_pose);
 
   ros::WallDuration(1.0).sleep();
 

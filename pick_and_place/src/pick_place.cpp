@@ -9,7 +9,7 @@ class MarkerPose{
     public:
       geometry_msgs::Pose marker_pose;
       MarkerPose(){
-          sub = nh.subscribe("aruco_single/marker", 1000, &MarkerPose::markerCallback,this);
+          sub = nh.subscribe("aruco_single/marker", 10, &MarkerPose::markerCallback,this);
       }
       void markerCallback(const visualization_msgs::Marker &msg)
       {
@@ -84,10 +84,11 @@ void pick(moveit::planning_interface::MoveGroupInterface& move_group, const Mark
   grasps[0].post_grasp_retreat.desired_distance = 0.25;
 
   // 设置抓取前爪子的状态
-  openGripper(move_group);
+  moveit::planning_interface::MoveGroupInterface gripper_group("gripper");
+  openGripper(gripper_group);
 
   // 设置爪子抓取的状态
-  closedGripper(move_group);
+  closedGripper(gripper_group);
 
   // 设置支撑面.
   move_group.setSupportSurfaceName("table2");
@@ -110,7 +111,7 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   //放置对象
   place_location[0].place_pose.pose.position.x = 0;
   place_location[0].place_pose.pose.position.y = 0;
-  place_location[0].place_pose.pose.position.z = 0.05;
+  place_location[0].place_pose.pose.position.z = 0.07;
 
   // S设置pre-place approach
   place_location[0].pre_place_approach.direction.header.frame_id = "base_link";
@@ -128,7 +129,8 @@ void place(moveit::planning_interface::MoveGroupInterface& group)
   place_location[0].post_place_retreat.desired_distance = 0.28;
 
   //设置放置对象完成前机械爪的状态
-  openGripper(group);
+  moveit::planning_interface::MoveGroupInterface gripper_group("gripper");
+  openGripper(gripper_group);
 
   // 设置支撑面table2.
   group.setSupportSurfaceName("table1");
@@ -198,13 +200,13 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
   collision_objects[2].primitives[0].dimensions.resize(3);
   collision_objects[2].primitives[0].dimensions[0] = 0.05;
   collision_objects[2].primitives[0].dimensions[1] = 0.05;
-  collision_objects[2].primitives[0].dimensions[2] = 0.1;
+  collision_objects[2].primitives[0].dimensions[2] = 0.14;
 
   //定义物块的位置
   collision_objects[2].primitive_poses.resize(1);
   collision_objects[2].primitive_poses[0].position.x = marker.marker_pose.position.x;
   collision_objects[2].primitive_poses[0].position.y = marker.marker_pose.position.y;
-  collision_objects[2].primitive_poses[0].position.z = 0.05;
+  collision_objects[2].primitive_poses[0].position.z = 0.07;
   collision_objects[2].primitive_poses[0].orientation.x = marker.marker_pose.orientation.x;
   collision_objects[2].primitive_poses[0].orientation.y = marker.marker_pose.orientation.y;
   collision_objects[2].primitive_poses[0].orientation.z = marker.marker_pose.orientation.z;
@@ -221,25 +223,25 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "vistar_pick_place");
   ros::AsyncSpinner spinner(2);
   spinner.start();
-  MarkerPose marker;
 
   moveit::planning_interface::PlanningSceneInterface planning_scene;
-  moveit::planning_interface::MoveGroupInterface arm("arm");
-  moveit::planning_interface::MoveGroupInterface gripper("gripper");
-  arm.setPlanningTime(45.0);
+  moveit::planning_interface::MoveGroupInterface arm_group("arm");
+  arm_group.setPlanningTime(45.0);
 
-  prepare(arm);
+  prepare(arm_group);
+
+  MarkerPose marker;
 
   addCollisionObjects(planning_scene,marker);
 
   // 等待场景初始化
   ros::WallDuration(1.0).sleep();
 
-  pick(arm,marker);
+  pick(arm_group,marker);
 
   ros::WallDuration(1.0).sleep();
 
-  place(arm);
+  place(arm_group);
 
   ros::waitForShutdown();
   return 0;

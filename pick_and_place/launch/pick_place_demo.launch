@@ -1,4 +1,4 @@
 <launch>
     <include file="$(find marker_detection)/launch/aruco_camera.launch"/>
-    <node pkg="pick_and_place" name="vistar_pick_place" type="pick_place"/>
+    <node pkg="pick_and_place" name="vistar_pick_place" type="pick_place_2_node"/>
 </launch>
