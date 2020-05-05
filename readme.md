@@ -1,60 +1,78 @@
 # vista_robot(ur3_with_robotiq_2f_85)
-## Usage
-1.  see robot model in rviz you can run the following command
----
-- view robotiq
+
+## 介绍
+
+该功能包用于识别ar标签进行pick和place仿真
+
+包含ur3和robotiq的机械臂模型，gazebo里的仿真实验环境，标签识别和pick_place。
+
+## 使用方法
+
+1.  rviz里查看模型
+
+- robotiq
 
 ```
 roslaunch robotiq_2f_85_gripper_description view_robotiq.launch
 ```
-- view ur3
+
+- ur3
 
 ```
 roslaunch ur3_description view_ur3.launch
 ```
-- view ur3_with_robotiq
+
+-  ur3_with_robotiq
+
 ```
 roslaunch vistar_description view_vistar.launch 
 ```
-2. see robot model in gazebo
+
+2.  gazebo里查看模型
+
 ---
-- view robotiq
+
+- robotiq
+
 ```
 roslaunch vistar_gazebo robotiq.launch
 ```
-- view ur3
+
+-  ur3
+
 ```
 roslaunch vistar_gazebo ur3.launch
 ```
-- view vistar
+
+-  vistar
+
 ```
 roslaunch vistar_gazebo vistar.launch
 ```
-- view vistar simulation
+
+- 加载仿真环境
+
 ```
 roslaunch vistar_gazebo  vistar_simulation.launch
 ```
-3. see robot moveit demo
----
+
+3. 启动moveit
+
 ```
-roslaunch vistar_moveit_config demo.launch
+roslaunch vistar_moveit_config vistar_moveit_planning_execution.launch
 ```
-## Problems for your help
-1. robotiq in gazeo which is not full and the error with joints has solved
---
-2. robotiq gripper in moveit can plan and excute now
----
-3. doubt about the model except vista_robot : how to spaw table、cube_marker and camera is the best way.
----
-my method is : 
 
-- camera(kinect): write top xacro for [vistar_with_kinect](./vistar_description/urdf/vistar_with_kinect.xacro) ,then push them together to the parameter and spawn in gazeo ,therefore
-the camera has its link.
+​     4.启动标签检测节点
 
-- table and the cube_marker : i dont send them to the parameter but spawn them in gazebo directly.
+```
+roslaunch marker_detection aruco_camera.launch
+```
 
-**you can see the [vistar_simulation.launch file ]( ./vistar_gazebo/launch/vistar_simulation.launch)for more details.**
+​	5.启动pickplace节点
 
-4. I can't see artag in rviz when I run the vistar simulation and ar_track_alvar  nomatter i use kinect or usb camera in gazebo. i dont know what'wrong after i had tried many times in some ways.
---
- 
+```
+rosrun pick_and_place pick_place_2_node
+```
+
+
+
