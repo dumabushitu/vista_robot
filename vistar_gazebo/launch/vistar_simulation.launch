@@ -1,35 +1,31 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="with_sensor" default="true"/>
+  <arg name="with_camera" default="true"/>
   <arg name="with_kinect" default="true"/>
   <arg name="paused" default="false" doc="Starts gazebo in paused mode" />
   <arg name="gui" default="true" doc="Starts gazebo gui" />
+  <arg name="world_name" default="$(find vistar_gazebo)/worlds/simulation_aruco.world"/>
   
   <!-- startup simulated world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="world_name" default="worlds/empty.world"/>
+    <arg name="world_name" value="$(arg world_name)"/>
     <arg name="paused" value="$(arg paused)"/>
     <arg name="gui" value="$(arg gui)"/>
   </include>
 
   <!-- send robot urdf to param server -->
    <include file="$(find vistar_description)/launch/vistar_upload.launch">
-    <arg name="with_kinect" value="$(arg with_kinect)"/>
+    <arg name="with_sensor" value="$(arg with_sensor)"/>   
+    <arg name="with_camera" value="$(arg with_camera)"/>
    </include>
+    <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -x 0.375 " respawn="false" output="screen" />
 
-
-  <!-- push robot_description to factory and spawn robot in gazebo -->
-  <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -z 1.0" respawn="false" output="screen" />
-
-
-  <!-- spawn the table in gazebo -->
-  <node name="spawn_table" pkg="gazebo_ros" type="spawn_model" args="-file $(find vistar_gazebo)/models/table/model.sdf -sdf -model table  -y 0.7" />
-  <!-- spawn the cube_marker in gazebo -->
-  <node name="cube_marker" pkg="gazebo_ros" type="spawn_model" args="-file $(find vistar_gazebo)/models/cube_marker/cube_marker.urdf -urdf -model cube_marker  -x 0.375 -y 0.7 -z 1.08" />
- 
   <include file="$(find vistar_gazebo)/launch/controller_utils.launch"/>
 
   <!-- start controller -->
-  <rosparam file="$(find vistar_gazebo)/controller/arm_controller.yaml" command="load"/>
+  <rosparam file="$(find vistar_gazebo)/controller/controller.yaml" command="load"/>
   <node name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn arm_controller " respawn="false" output="screen"/>
 
   <node name="gripper_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn gripper_controller"  respawn="false" output="screen"/>

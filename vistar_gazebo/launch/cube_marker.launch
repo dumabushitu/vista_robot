@@ -10,13 +10,9 @@
     <arg name="gui" value="$(arg gui)"/>
   </include>
 
-  <!-- send robot urdf to param server -->
-  <param name="robot_description" textfile="$(find vistar_gazebo)/models/cube_marker/cube_marker.urdf" />  
-
   <!-- push robot_description to factory and spawn robot in gazebo -->
-  <node name="spawn_cube_marker" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot -z 0.1" respawn="false" output="screen" />
-
-  <include file="$(find vistar_gazebo)/launch/controller_utils.launch"/>
-
-  <include file="$(find learning_vision)/launch/ar_track_camera.launch"/>
+  <node name="spawn_table1" pkg="gazebo_ros" type="spawn_model" args="-file $(find vistar_gazebo)/models/table/model.sdf -sdf -model table1  " />
+  <node name="spawn_table2" pkg="gazebo_ros" type="spawn_model" args="-file $(find vistar_gazebo)/models/table/model.sdf -sdf -model table2  -y 0.8" />
+  <node name="spawn_cube_marker" pkg="gazebo_ros" type="spawn_model" args="-file $(find vistar_gazebo)/models/cube_marker/cube_marker.urdf -urdf  -model cube_marker -x 0.375 -y 0.8 -P -1.57" respawn="false" output="screen" />
+ 
 </launch>

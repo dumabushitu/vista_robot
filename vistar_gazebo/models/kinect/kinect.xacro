@@ -30,14 +30,14 @@
                 </geometry>
             </collision>
         </link>
-<!--
-<joint name="camera_depth_joint" type="fixed">
+
+<!--<joint name="${prefix}_depth_joint" type="fixed">
     <origin xyz="0 0.011 0" rpy="0 0 0" />
-    <parent link="camera_link" />
-    <child link="camera_depth_frame" />
+    <parent link="${prefix}_link" />
+    <child link="${prefix}_depth_frame" />
   </joint>
 
-  <link name="camera_depth_frame">
+  <link name="${prefix}_depth_frame">
     <inertial>
       <mass value="0.01" />
       <origin xyz="0 0 0" />
@@ -47,13 +47,13 @@
     </inertial>
   </link>
 
-  <joint name="camera_depth_optical_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-    <parent link="camera_depth_frame" />
-    <child link="camera_depth_optical_frame" />
+  <joint name="${prefix}_depth_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="${prefix}_depth_frame" />
+    <child link="${prefix}_depth_optical_frame" />
   </joint>
 
-  <link name="camera_depth_optical_frame">
+  <link name="${prefix}_depth_optical_frame">
     <inertial>
       <mass value="0.001" />
       <origin xyz="0 0 0" />
@@ -63,13 +63,13 @@
     </inertial>
   </link>
 
-  <joint name="camera_rgb_joint" type="fixed">
+  <joint name="${prefix}_rgb_joint" type="fixed">
     <origin xyz="0 -0.012 0" rpy="0 0 0" />
-    <parent link="camera_link" />
-    <child link="camera_rgb_frame" />
+    <parent link="${prefix}_link" />
+    <child link="${prefix}_rgb_frame" />
   </joint>
 
-  <link name="camera_rgb_frame">
+  <link name="${prefix}_rgb_frame">
     <inertial>
       <mass value="0.001" />
       <origin xyz="0 0 0" />
@@ -79,13 +79,13 @@
     </inertial>
   </link>
 
-  <joint name="camera_rgb_optical_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="${-M_PI/2} 0 ${-M_PI/2}" />
-    <parent link="camera_rgb_frame" />
-    <child link="camera_rgb_optical_frame" />
+  <joint name="${prefix}_rgb_optical_joint" type="fixed">
+    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
+    <parent link="${prefix}_rgb_frame" />
+    <child link="${prefix}_rgb_optical_frame" />
   </joint>
 
-  <link name="camera_rgb_optical_frame">
+  <link name="${prefix}_rgb_optical_frame">
     <inertial>
       <mass value="0.001" />
       <origin xyz="0 0 0" />
@@ -94,7 +94,7 @@
         izz="0.0001" />
     </inertial>
   </link>
-  -->
+-->
         <gazebo reference="${prefix}_link">
             <sensor type="depth" name="${prefix}">
                 <always_on>true</always_on>

@@ -55,8 +55,9 @@
   <exec_depend>visar_description</exec_depend>
   <exec_depend>vistar_gazebo</exec_depend>
   <exec_depend>vistar_moveit_config</exec_depend>
-
-
+  <exec_depend>pick_and_place</exec_depend>
+  <exec_depend>aruco_ros</exec_depend>
+  <exec_depend>marker_detection</exec_depend>
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>

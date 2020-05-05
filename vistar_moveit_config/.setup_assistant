@@ -1,11 +1,11 @@
 moveit_setup_assistant_config:
   URDF:
     package: vistar_description
-    relative_path: urdf/ur3_with_robotiq.xacro
+    relative_path: urdf/vistar_with_camera.xacro
     xacro_args: ""
   SRDF:
-    relative_path: config/vistar_robot.srdf
+    relative_path: config/vistar.srdf
   CONFIG:
     author_name: dumabushitu
     author_email: dumabushitu@gmail.com
-    generated_timestamp: 1587894623
+    generated_timestamp: 1588226437
