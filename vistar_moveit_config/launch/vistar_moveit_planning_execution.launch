@@ -1,0 +1,15 @@
+<launch>
+
+  <arg name="debug" default="false" />
+
+  <!-- Launch moveit -->
+  <include file="$(find vistar_moveit_config)/launch/move_group.launch">
+    <arg name="debug" default="$(arg debug)" />
+  </include>
+
+  <include file="$(find vistar_moveit_config)/launch/moveit_rviz.launch">
+    <arg name="rviz_config" value="$(find vistar_moveit_config)/launch/moveit.rviz"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+
+</launch>

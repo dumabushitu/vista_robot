@@ -1,7 +1,8 @@
 <?xml version="1.0"?>
 <launch>
   <include file="$(find vistar_description)/launch/vistar_upload.launch">
-    <arg name="with_kinect" value="true"/>
+    <arg name="with_sensor" value="true"/>
+    <arg name="with_camera" value="true"/>
   </include>
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
     <param name="use_gui" value="true"/>

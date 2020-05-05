@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+    <robot name="kinect" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+        <link name="world"/>
+        <joint name="world_fixed" type="fixed">
+            <origin xyz="0 0 0.025" rpy="0 0 0"/>
+            <parent link="world"/>
+            <child link="root_link"/>
+        </joint>
+
+        <link name="root_link">
+            <visual>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.1 0.1 0.05"/>
+                </geometry>
+            </visual>
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0"/>
+                <geometry>
+                    <box size="0.1 0.1 0.05"/>
+                </geometry>
+            </collision>
+            <inertial>
+                <mass value="1e2" />
+                <origin xyz="0.0 0.0 0.0" />
+                <inertia ixx = "0.000001" ixy = "0.000000" ixz = "0.000000"
+                        iyx = "0.000000" iyy = "0.000001" iyz = "0.000000"
+                        izx = "0.000000" izy = "0.000000" izz = "0.000001" />
+            </inertial>
+        </link>
+        <xacro:include filename="$(find vistar_gazebo)/models/kinect/kinect.xacro"/>
+        <xacro:kinect_camera  parent="root_link" prefix="camera" >
+            <origin xyz="0 0 0.05" rpy="0 0 0"/>
+        </xacro:kinect_camera>
+    <gazebo>
+    <plugin name="ros_control" filename="libgazebo_ros_control.so">
+      <!--robotNamespace>/</robotNamespace-->
+      <!--robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType-->
+    </plugin>
+	</gazebo>
+    </robot>

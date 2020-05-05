@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="paused" default="false" doc="Starts gazebo in paused mode" />
+  <arg name="gui" default="true" doc="Starts gazebo gui" />
+  
+  <!-- startup simulated world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" default="worlds/empty.world"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+  </include>
+
+  <!-- send kinect urdf to param server -->
+  <param name="robot_description" command="$(find xacro)/xacro  $(find vistar_gazebo)/models/kinect/kinect.model.xacro " />  
+
+  <!-- push kinect_description to factory and spawn robot in gazebo -->
+  <node name="spawn_kinect" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model kinect -y 1 -Y -1.57 " respawn="false" output="screen" />
+    
+    
+  <param name="marker_description" textfile="$(find vistar_gazebo)/models/marker/ar_2020.urdf" />
+
+    <!-- Run a python script to the send a service call to gazebo_ros to spawn a URDF robot -->
+    <node name="marker_spawner" pkg="gazebo_ros" type="spawn_model" respawn="false" output="screen"
+    args="-urdf  -model marker -param marker_description -z 0.1 -R 1.57"/>
+
+
+  <include file="$(find vistar_gazebo)/launch/controller_utils.launch"/>
+<!--
+  <include file="$(find learning_vision)/launch/ar_track_kinect.launch"/>
+-->
+</launch>

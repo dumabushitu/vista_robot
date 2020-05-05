@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="paused" default="false" doc="Starts gazebo in paused mode" />
+  <arg name="gui" default="true" doc="Starts gazebo gui" />
+  
+  <!-- startup simulated world -->
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="world_name" default="worlds/empty.world"/>
+    <arg name="paused" value="$(arg paused)"/>
+    <arg name="gui" value="$(arg gui)"/>
+  </include>
+
+  <!-- push robot_description to factory and spawn robot in gazebo -->
+  <node name="spawn_table1" pkg="gazebo_ros" type="spawn_model" args="-file $(find vistar_gazebo)/models/table/model.sdf -sdf -model table1  " />
+  <node name="spawn_table2" pkg="gazebo_ros" type="spawn_model" args="-file $(find vistar_gazebo)/models/table/model.sdf -sdf -model table2  -y 0.8" />
+ 
+ 
+</launch>

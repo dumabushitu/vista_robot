@@ -1,7 +1,10 @@
 <?xml version="1.0"?>
 <launch>
+    <arg name="with_sensor" default="false" />
     <arg name="with_kinect" default="false" />
+    <arg name="with_camera" default="false" />
 
-    <param unless="$(arg with_kinect)" name="robot_description" command="$(find xacro)/xacro --inorder '$(find vistar_description)/urdf/ur3_with_robotiq.xacro'" /> 
+    <param unless="$(arg with_sensor)" name="robot_description" command="$(find xacro)/xacro --inorder '$(find vistar_description)/urdf/ur3_with_robotiq.xacro'" /> 
     <param if="$(arg with_kinect)" name="robot_description" command="$(find xacro)/xacro --inorder '$(find vistar_description)/urdf/vistar_with_kinect.xacro'" /> 
+    <param if="$(arg with_camera)" name="robot_description" command="$(find xacro)/xacro --inorder '$(find vistar_description)/urdf/vistar_with_camera.xacro'" /> 
 </launch>
