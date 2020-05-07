@@ -469,32 +469,46 @@
 				</actuator>
 			</transmission>
 
-			<gazebo>
-				<plugin name="${name}_right_follower_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
-					<joint>${name}_right_driver_joint</joint>
-					<mimicJoint>${name}_right_follower_joint</mimicJoint>
-					<multiplier>-1</multiplier>
-				</plugin>
-				<plugin name="${name}_right_spring_link_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
-					<joint>${name}_right_driver_joint</joint>
-					<mimicJoint>${name}_right_spring_link_joint</mimicJoint>
-					<multiplier>1</multiplier>
-				</plugin>
-				<plugin name="${name}_left_follower_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
-					<joint>${name}_right_driver_joint</joint>
-					<mimicJoint>${name}_left_follower_joint</mimicJoint>
-					<multiplier>-1</multiplier>
-				</plugin>
-				<plugin name="${name}_left_spring_link_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
-					<joint>${name}_right_driver_joint</joint>
-					<mimicJoint>${name}_left_spring_link_joint</mimicJoint>
-					<multiplier>1</multiplier>
-				</plugin>
-				<plugin name="${name}_left_driver_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
-					<joint>${name}_right_driver_joint</joint>
-					<mimicJoint>${name}_left_driver_joint</mimicJoint>
-					<multiplier>1</multiplier>
-				</plugin>
+		<gazebo>
+			<plugin name="${name}_right_follower_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
+				<joint>${name}_right_driver_joint</joint>
+				<mimicJoint>${name}_right_follower_joint</mimicJoint>
+				<multiplier>-1</multiplier>
+			</plugin>
+			<plugin name="${name}_right_spring_link_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
+				<joint>${name}_right_driver_joint</joint>
+				<mimicJoint>${name}_right_spring_link_joint</mimicJoint>
+				<multiplier>1</multiplier>
+			</plugin>
+			<plugin name="${name}_left_follower_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
+				<joint>${name}_right_driver_joint</joint>
+				<mimicJoint>${name}_left_follower_joint</mimicJoint>
+				<multiplier>-1</multiplier>
+			</plugin>
+			<plugin name="${name}_left_spring_link_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
+				<joint>${name}_right_driver_joint</joint>
+				<mimicJoint>${name}_left_spring_link_joint</mimicJoint>
+				<multiplier>1</multiplier>
+			</plugin>
+			<plugin name="${name}_left_driver_joint_plugin" filename="libroboticsgroup_gazebo_mimic_joint_plugin.so">
+				<joint>${name}_right_driver_joint</joint>
+				<mimicJoint>${name}_left_driver_joint</mimicJoint>
+				<multiplier>1</multiplier>
+			</plugin>
+		</gazebo>
+		<gazebo reference="${name}_right_pad">
+		    <implicitSpringDamper>1</implicitSpringDamper>
+		    <mu1>100000</mu1>
+		    <mu2>100000</mu2>
+		    <kp>100000000.0</kp>
+		    <kd>1.0</kd>
+		</gazebo>
+		<gazebo reference="${name}_left_pad">
+		    <implicitSpringDamper>1</implicitSpringDamper>
+		    <mu1>100000</mu1>
+		    <mu2>100000</mu2>
+		    <kp>100000000.0</kp>
+		    <kd>1.0</kd>
 		</gazebo>
 	</xacro:unless>
 	</xacro:macro>

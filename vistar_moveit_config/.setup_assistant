@@ -1,11 +1,11 @@
 moveit_setup_assistant_config:
   URDF:
     package: vistar_description
-    relative_path: urdf/vistar_with_camera.xacro
+    relative_path: urdf/vistar_with_topkinect.xacro
     xacro_args: ""
   SRDF:
     relative_path: config/vistar.srdf
   CONFIG:
     author_name: dumabushitu
     author_email: dumabushitu@gmail.com
-    generated_timestamp: 1588226437
+    generated_timestamp: 1588859151

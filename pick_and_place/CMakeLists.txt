@@ -35,6 +35,7 @@ find_package(catkin REQUIRED)
 ## * In this file (CMakeLists.txt):
 ##   * add "message_generation" and every package in MSG_DEP_SET to
 find_package(catkin REQUIRED COMPONENTS
+  rospy
   roscpp
   std_msgs
   geometry_msgs
@@ -44,7 +45,6 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_geometry_msgs
   moveit_ros_planning_interface
   moveit_ros_move_group
-  aruco_ros
 )
 ##   * add "message_runtime" and every package in MSG_DEP_SET to
 ##     catkin_package(CATKIN_DEPENDS ...)
@@ -144,17 +144,8 @@ include_directories(
 add_executable(pick_place_node src/pick_place.cpp)
 target_link_libraries(pick_place_node ${catkin_LIBRARIES})
 
-add_executable(pick_place_1_node src/pick_place.1.cpp)
-target_link_libraries(pick_place_1_node ${catkin_LIBRARIES})
-
-add_executable(pick_place_2_node src/pick_place.2.cpp)
-target_link_libraries(pick_place_2_node ${catkin_LIBRARIES})
-
-add_executable(test_random_node src/test_random.cpp)
-target_link_libraries(test_random_node ${catkin_LIBRARIES})
-
-add_executable(test_custom_node src/test_custom.cpp)
-target_link_libraries(test_custom_node ${catkin_LIBRARIES})
+add_executable(test_pick_node src/test_pick.cpp)
+target_link_libraries(test_pick_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the

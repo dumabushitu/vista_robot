@@ -1,13 +1,13 @@
 <launch>
 
 
-    <arg name="marker_size" default="5.0" />
+    <arg name="marker_size" default="4.0" />
     <arg name="max_new_marker_error" default="0.08" />
     <arg name="max_track_error" default="0.2" />
 
     <arg name="cam_image_topic" default="/camera/depth/points" />
     <arg name="cam_info_topic" default="/camera/rgb/camera_info" />
-    <arg name="output_frame" default="/camera_link" />
+    <arg name="output_frame" default="/camera_frame_optical" />
 
     <node name="ar_track_alvar" pkg="ar_track_alvar" type="individualMarkers" respawn="false" output="screen">
         <param name="marker_size" type="double" value="$(arg marker_size)" />
@@ -18,8 +18,5 @@
         <remap from="camera_image"  to="$(arg cam_image_topic)" />
         <remap from="camera_info"   to="$(arg cam_info_topic)" />
     </node>
-
-    <!-- rviz view /-->
- <!--   <node pkg="rviz" type="rviz" name="rviz" args="-d $(find robot_vision)/config/ar_track_kinect.rviz"/>
--->
+    
 </launch>

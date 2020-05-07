@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="with_sensor" default="true"/>
   <arg name="with_kinect" default="true"/>
   <arg name="paused" default="false" doc="Starts gazebo in paused mode" />
   <arg name="gui" default="true" doc="Starts gazebo gui" />
@@ -13,7 +14,8 @@
 
   <!-- send robot urdf to param server -->
    <include file="$(find vistar_description)/launch/vistar_upload.launch">
-    <arg name="with_kinect" value="$(arg with_kinect)"/>
+    <arg name="with_sensor" value="$(arg with_sensor)"/>
+    <arg name="with_topkinect" value="$(arg with_kinect)"/>
    </include>
 
 
@@ -23,7 +25,7 @@
   <include file="$(find vistar_gazebo)/launch/controller_utils.launch"/>
 
   <!-- start controller -->
-  <rosparam file="$(find vistar_gazebo)/controller/arm_controller.yaml" command="load"/>
+  <rosparam file="$(find vistar_gazebo)/controller/controller.yaml" command="load"/>
   <node name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn arm_controller " respawn="false" output="screen"/>
 
   <node name="gripper_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn gripper_controller"  respawn="false" output="screen"/>

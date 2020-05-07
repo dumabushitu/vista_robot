@@ -1,6 +1,5 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="kinect_camera">
-    
     <xacro:macro name="kinect_camera" params="parent prefix:=camera  *origin">
         <joint name="${parent}_${prefix}_base_joint" type="fixed">
 			<xacro:insert_block name="origin"/>
@@ -17,13 +16,6 @@
                     <mesh filename="package://vistar_gazebo/models/kinect/meshes/kinect.dae" />
                 </geometry>
             </visual>
-            <inertial>
-                <mass value="0.01" />
-                <origin xyz="0 0 0" />
-                <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-                        iyy="0.001" iyz="0.0"
-                        izz="0.001" />
-            </inertial>
             <collision>
                 <geometry>
                     <box size="0.07 0.3 0.09"/>
@@ -31,70 +23,14 @@
             </collision>
         </link>
 
-<!--<joint name="${prefix}_depth_joint" type="fixed">
-    <origin xyz="0 0.011 0" rpy="0 0 0" />
-    <parent link="${prefix}_link" />
-    <child link="${prefix}_depth_frame" />
-  </joint>
+        <joint name="${prefix}_optical_joint" type="fixed">
+            <origin xyz="0 0 0" rpy="-1.5708 0 -1.5708"/>
+            <parent link="${prefix}_link"/>
+            <child link="${prefix}_frame_optical"/>
+        </joint>
 
-  <link name="${prefix}_depth_frame">
-    <inertial>
-      <mass value="0.01" />
-      <origin xyz="0 0 0" />
-      <inertia ixx="0.001" ixy="0.0" ixz="0.0"
-        iyy="0.001" iyz="0.0"
-        izz="0.001" />
-    </inertial>
-  </link>
+        <link name="${prefix}_frame_optical"/>
 
-  <joint name="${prefix}_depth_optical_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
-    <parent link="${prefix}_depth_frame" />
-    <child link="${prefix}_depth_optical_frame" />
-  </joint>
-
-  <link name="${prefix}_depth_optical_frame">
-    <inertial>
-      <mass value="0.001" />
-      <origin xyz="0 0 0" />
-      <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
-        iyy="0.0001" iyz="0.0"
-        izz="0.0001" />
-    </inertial>
-  </link>
-
-  <joint name="${prefix}_rgb_joint" type="fixed">
-    <origin xyz="0 -0.012 0" rpy="0 0 0" />
-    <parent link="${prefix}_link" />
-    <child link="${prefix}_rgb_frame" />
-  </joint>
-
-  <link name="${prefix}_rgb_frame">
-    <inertial>
-      <mass value="0.001" />
-      <origin xyz="0 0 0" />
-      <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
-        iyy="0.0001" iyz="0.0"
-        izz="0.0001" />
-    </inertial>
-  </link>
-
-  <joint name="${prefix}_rgb_optical_joint" type="fixed">
-    <origin xyz="0 0 0" rpy="${-pi/2} 0 ${-pi/2}" />
-    <parent link="${prefix}_rgb_frame" />
-    <child link="${prefix}_rgb_optical_frame" />
-  </joint>
-
-  <link name="${prefix}_rgb_optical_frame">
-    <inertial>
-      <mass value="0.001" />
-      <origin xyz="0 0 0" />
-      <inertia ixx="0.0001" ixy="0.0" ixz="0.0"
-        iyy="0.0001" iyz="0.0"
-        izz="0.0001" />
-    </inertial>
-  </link>
--->
         <gazebo reference="${prefix}_link">
             <sensor type="depth" name="${prefix}">
                 <always_on>true</always_on>
@@ -120,7 +56,7 @@
                     <pointCloudTopicName>depth/points</pointCloudTopicName>
                     <cameraInfoTopicName>rgb/camera_info</cameraInfoTopicName>
                     <depthImageCameraInfoTopicName>depth/camera_info</depthImageCameraInfoTopicName>
-                    <frameName>${prefix}_link</frameName>
+                    <frameName>${prefix}_frame_optical</frameName>
                     <baseline>0.1</baseline>
                     <distortion_k1>0.0</distortion_k1>
                     <distortion_k2>0.0</distortion_k2>

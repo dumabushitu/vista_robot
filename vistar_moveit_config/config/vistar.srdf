@@ -27,17 +27,9 @@
     <group_state name="up" group="arm">
         <joint name="elbow_joint" value="0" />
         <joint name="shoulder_lift_joint" value="-1.5707" />
-        <joint name="shoulder_pan_joint" value="0" />
+        <joint name="shoulder_pan_joint" value="-1.5707" />
         <joint name="wrist_1_joint" value="-1.5707" />
         <joint name="wrist_2_joint" value="0" />
-        <joint name="wrist_3_joint" value="0" />
-    </group_state>
-    <group_state name="prepare" group="arm">
-        <joint name="elbow_joint" value="1.0471" />
-        <joint name="shoulder_lift_joint" value="-1.0471" />
-        <joint name="shoulder_pan_joint" value="1.5707" />
-        <joint name="wrist_1_joint" value="-1.5707" />
-        <joint name="wrist_2_joint" value="-1.5707" />
         <joint name="wrist_3_joint" value="0" />
     </group_state>
     <group_state name="open" group="gripper">
@@ -45,6 +37,22 @@
     </group_state>
     <group_state name="close" group="gripper">
         <joint name="gripper_right_driver_joint" value="0.35" />
+    </group_state>
+    <group_state name="pick_prepare" group="arm">
+        <joint name="elbow_joint" value="-1.5707" />
+        <joint name="shoulder_lift_joint" value="-1.5707" />
+        <joint name="shoulder_pan_joint" value="-1.5707" />
+        <joint name="wrist_1_joint" value="3.1415" />
+        <joint name="wrist_2_joint" value="-1.5707" />
+        <joint name="wrist_3_joint" value="0" />
+    </group_state>
+    <group_state name="pick10cm_prepare" group="arm">
+        <joint name="elbow_joint" value="-1.5707" />
+        <joint name="shoulder_lift_joint" value="-1.5707" />
+        <joint name="shoulder_pan_joint" value="-1.5707" />
+        <joint name="wrist_1_joint" value="-1.5707" />
+        <joint name="wrist_2_joint" value="1.5707" />
+        <joint name="wrist_3_joint" value="0" />
     </group_state>
     <!--END EFFECTOR: Purpose: Represent information about an end effector.-->
     <end_effector name="robotiq_gripper" parent_link="ee_link" group="gripper" />
@@ -55,24 +63,10 @@
     <passive_joint name="gripper_right_follower_joint" />
     <passive_joint name="gripper_right_spring_link_joint" />
     <!--DISABLE COLLISIONS: By default it is assumed that any link of the robot could potentially come into collision with any other link in the robot. This tag disables collision checking between a specified pair of links. -->
+    <disable_collisions link1="base_link" link2="camera_link" reason="Adjacent" />
     <disable_collisions link1="base_link" link2="shoulder_link" reason="Adjacent" />
-    <disable_collisions link1="camera_base_link" link2="camera_link" reason="Adjacent" />
-    <disable_collisions link1="camera_base_link" link2="ee_link" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="gripper_base" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="gripper_left_coupler" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="gripper_left_driver" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="gripper_left_follower" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="gripper_left_pad" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="gripper_left_spring_link" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="gripper_right_coupler" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="gripper_right_driver" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="gripper_right_follower" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="gripper_right_pad" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="gripper_right_spring_link" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="wrist_1_link" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="wrist_2_link" reason="Never" />
-    <disable_collisions link1="camera_base_link" link2="wrist_3_link" reason="Adjacent" />
     <disable_collisions link1="camera_link" link2="ee_link" reason="Never" />
+    <disable_collisions link1="camera_link" link2="forearm_link" reason="Never" />
     <disable_collisions link1="camera_link" link2="gripper_base" reason="Never" />
     <disable_collisions link1="camera_link" link2="gripper_left_coupler" reason="Never" />
     <disable_collisions link1="camera_link" link2="gripper_left_driver" reason="Never" />
@@ -84,6 +78,8 @@
     <disable_collisions link1="camera_link" link2="gripper_right_follower" reason="Never" />
     <disable_collisions link1="camera_link" link2="gripper_right_pad" reason="Never" />
     <disable_collisions link1="camera_link" link2="gripper_right_spring_link" reason="Never" />
+    <disable_collisions link1="camera_link" link2="shoulder_link" reason="Never" />
+    <disable_collisions link1="camera_link" link2="upper_arm_link" reason="Never" />
     <disable_collisions link1="camera_link" link2="wrist_1_link" reason="Never" />
     <disable_collisions link1="camera_link" link2="wrist_2_link" reason="Never" />
     <disable_collisions link1="camera_link" link2="wrist_3_link" reason="Never" />

@@ -1,9 +1,11 @@
 <?xml version="1.0"?>
 <launch>
-  <include file="$(find vistar_description)/launch/vistar_upload.launch">
+ <!-- <include file="$(find vistar_description)/launch/vistar_upload.launch">
     <arg name="with_sensor" value="true"/>
     <arg name="with_camera" value="true"/>
   </include>
+  -->
+  <param name="robot_description" textfile="$(find vistar_gazebo)/urdf/vistar_with_topkinect.urdf" /> 
   <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
     <param name="use_gui" value="true"/>
   </node>

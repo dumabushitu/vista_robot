@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <launch>
   <arg name="with_sensor" default="true"/>
-  <arg name="with_camera" default="true"/>
-  <arg name="with_kinect" default="true"/>
+  <arg name="with_camera" default="false"/>
+  <arg name="with_kinect" default="false"/>
+  <arg name="with_topkinect" default="true"/>
   <arg name="paused" default="false" doc="Starts gazebo in paused mode" />
   <arg name="gui" default="true" doc="Starts gazebo gui" />
-  <arg name="world_name" default="$(find vistar_gazebo)/worlds/simulation_aruco.world"/>
+  <arg name="world_name" default="$(find vistar_gazebo)/worlds/simulation.world"/>
   
   <!-- startup simulated world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
@@ -17,7 +18,7 @@
   <!-- send robot urdf to param server -->
    <include file="$(find vistar_description)/launch/vistar_upload.launch">
     <arg name="with_sensor" value="$(arg with_sensor)"/>   
-    <arg name="with_camera" value="$(arg with_camera)"/>
+    <arg name="with_topkinect" value="$(arg with_topkinect)"/>
    </include>
     <!-- push robot_description to factory and spawn robot in gazebo -->
   <node name="spawn_gazebo_model" pkg="gazebo_ros" type="spawn_model" args="-urdf -param robot_description -model robot " respawn="false" output="screen" />
@@ -29,5 +30,7 @@
   <node name="arm_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn arm_controller " respawn="false" output="screen"/>
 
   <node name="gripper_controller_spawner" pkg="controller_manager" type="controller_manager" args="spawn gripper_controller"  respawn="false" output="screen"/>
+  
+  <include file="$(find marker_detection)/launch/ar_track_kinect.launch"/>>
 
 </launch>
