@@ -18,8 +18,8 @@ GROUP_NAME_GRIPPER = 'gripper'
 
 GRIPPER_FRAME = 'ee_link'
 
-GRIPPER_OPEN = [0.04]
-GRIPPER_CLOSED = [0.34]
+GRIPPER_OPEN = [0.04,0,0,0]
+GRIPPER_CLOSED = [0.35]
 
 REFERENCE_FRAME = 'base_link'
 
@@ -60,7 +60,7 @@ class PickAndPlaceDemo:
         arm.allow_replanning(True)
         
         # 设置目标位置所使用的参考坐标系
-        arm.set_pose_reference_frame(REFERENCE_FRAME)
+        #arm.set_pose_reference_frame(REFERENCE_FRAME)
         
         # 设置每次运动规划的时间限制：20s
         arm.set_planning_time(20)
@@ -71,11 +71,13 @@ class PickAndPlaceDemo:
         rospy.sleep(2)
 
         # 设置场景物体的名称 
-        table_id = 'table'
+        table1_id = 'table1'
+        table2_id = 'table2'
         target_id = 'cube_marker'
                 
         # 移除场景中之前运行残留的物体
-        scene.remove_world_object(table_id)
+        scene.remove_world_object(table1_id)
+        scene.remove_world_object(table2_id)
         scene.remove_world_object(target_id)
         
         # 移除场景中之前与机器臂绑定的物体
@@ -83,7 +85,7 @@ class PickAndPlaceDemo:
         rospy.sleep(1)
         
         # 控制机械臂先运动到准备位置
-        arm.set_named_target('up')
+        arm.set_named_target('home')
         arm.go()
         
         # 控制夹爪张开
@@ -92,25 +94,35 @@ class PickAndPlaceDemo:
         rospy.sleep(1)
      
         # 设置table的三维尺寸[长, 宽, 高]
-        table_size = [0.8, 1.5, 0.03]
+        table1_size = [0.8, 1.5, 0.03]
+        table2_size = [1.5, 0.8, 0.03]
         
-        # 将物体加入场景当中
-        table_pose = PoseStamped()
-        table_pose.header.frame_id = REFERENCE_FRAME
-        table_pose.pose.position.x = 0
-        table_pose.pose.position.y = table_size[1] / 2.0
-        table_pose.pose.position.z = -0.05
-        table_pose.pose.orientation.w = 1.0
-        scene.add_box(table_id, table_pose, table_size)
+        # 将两张桌子加入场景当中
+        table1_pose = PoseStamped()
+        table1_pose.header.frame_id = 'base_link'
+        table1_pose.pose.position.x = 0
+        table1_pose.pose.position.y = 1.05
+        table1_pose.pose.position.z = -0.05
+        table1_pose.pose.orientation.w = 1.0
+        scene.add_box(table1_id, table1_pose, table1_size)
+
+        table2_pose = PoseStamped()
+        table2_pose.header.frame_id = 'base_link'
+        table2_pose.pose.position.x = -1.05
+        table2_pose.pose.position.y = -0.1
+        table2_pose.pose.position.z = -0.05
+        table2_pose.pose.orientation.w = 1.0
+        scene.add_box(table2_id, table2_pose, table2_size)
                              
         # 将桌子设置成红色
-        self.setColor(table_id, 0.8, 0.4, 0, 1.0)
+        self.setColor(table1_id, 0.8, 0.4, 0, 1.0)
+        self.setColor(table2_id, 0.8, 0.4, 0, 1.0)
 
-        #监听目标到reference_frame的tf变换
+        #监听目标到'base_link'的tf变换
         listener = tf.TransformListener()
         while not rospy.is_shutdown():
             try:
-                listener.waitForTransform('base_link', 'ar_marker_0', rospy.Time(0))
+                (trans,rot) = listener.lookupTransform('base_link', 'ar_marker_0', rospy.Time(0))
                 break
             except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
                 rospy.loginfo("Waiting for transform between 'base_link' and 'ar_marker_0'")
@@ -142,17 +154,31 @@ class PickAndPlaceDemo:
         self.sendColors()
 
         # 设置支持的外观
-        arm.set_support_surface_name(table_id)
+        arm.set_support_surface_name(table2_id)
         
         # 设置一个place阶段需要放置物体的目标位置
         place_pose = PoseStamped()
         place_pose.header.frame_id = REFERENCE_FRAME
-        place_pose.pose.position.x =  -0.3
-        place_pose.pose.position.y =  0.5
+        place_pose.pose.position.x =  -0.5
+        place_pose.pose.position.y =  0
         place_pose.pose.position.z =  0.065
 
+        while not rospy.is_shutdown():
+            try:
+                listener.waitForTransform('ar_marker_0', 'ee_link', rospy.Time(0),rospy.Duration(4.0))
+                break
+            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+                rospy.loginfo("Waiting for transform between 'ar_marker_0' and 'ee_link'")
+                rospy.sleep(1)
+
+        rospy.loginfo("Found transform between 'ar_marker_0' and 'ee_link'") 
+
         # 将目标位置设置为机器人的抓取目标位置
-        grasp_pose = target_pose
+        grasp_pose = PoseStamped()
+        grasp_pose.header.frame_id = 'ar_marker_0'
+        grasp_pose.pose.position.x =  0
+        grasp_pose.pose.position.y =  -0.15
+        grasp_pose.pose.position.z =  -0.1
                 
         # 生成抓取姿态
         grasps = self.make_grasps(grasp_pose, [target_id])
@@ -182,17 +208,17 @@ class PickAndPlaceDemo:
             places = self.make_places(place_pose)
             
             # 重复尝试放置，直道成功或者超多最大尝试次数
-        while result != MoveItErrorCodes.SUCCESS and n_attempts < max_place_attempts:
-            n_attempts += 1
-            rospy.loginfo("Place attempt: " +  str(n_attempts))
-            for place in places:
-                result = arm.place(target_id, place)
-                if result == MoveItErrorCodes.SUCCESS:
-                    break
-            rospy.sleep(0.2)
-            
-        if result != MoveItErrorCodes.SUCCESS:
-            rospy.loginfo("Place operation failed after " + str(n_attempts) + " attempts.")
+            while result != MoveItErrorCodes.SUCCESS and n_attempts < max_place_attempts:
+                n_attempts += 1
+                rospy.loginfo("Place attempt: " +  str(n_attempts))
+                for place in places:
+                    result = arm.place(target_id, place)
+                    if result == MoveItErrorCodes.SUCCESS:
+                        break
+                rospy.sleep(0.2)
+                
+            if result != MoveItErrorCodes.SUCCESS:
+                rospy.loginfo("Place operation failed after " + str(n_attempts) + " attempts.")
         else:
             rospy.loginfo("Pick operation failed after " + str(n_attempts) + " attempts.")
                 
@@ -236,7 +262,7 @@ class PickAndPlaceDemo:
         return t
     
     # 使用给定向量创建夹爪的translation结构
-    def make_gripper_translation(self, min_dist, desired, vector):
+    def make_gripper_translation(self, min_dist, desired, frame, vector):
         # 初始化translation对象
         g = GripperTranslation()
         
@@ -246,7 +272,7 @@ class PickAndPlaceDemo:
         g.direction.vector.z = vector[2]
         
         # 设置参考坐标系
-        g.direction.header.frame_id = REFERENCE_FRAME
+        g.direction.header.frame_id = frame
         
         # 设置最小和期望的距离
         g.min_distance = min_dist
@@ -265,8 +291,8 @@ class PickAndPlaceDemo:
         g.grasp_posture = self.make_gripper_posture(GRIPPER_CLOSED)
                 
         # 设置期望的夹爪靠近、撤离目标的参数
-        g.pre_grasp_approach = self.make_gripper_translation(0.05, 0.1, [0.0, 1.0, 0.0])
-        g.post_grasp_retreat = self.make_gripper_translation(0.1, 0.15, [0.0, 0.0, 1.0])
+        g.pre_grasp_approach = self.make_gripper_translation(0.05, 0.1, 'ar_marker_0' ,[0.0, 1.0, 0.0])
+        g.post_grasp_retreat = self.make_gripper_translation(0.1, 0.15,'base_link', [0.0, 0.0, 1.0])
         
         # 设置抓取姿态
         g.grasp_pose = initial_pose_stamped
@@ -279,24 +305,24 @@ class PickAndPlaceDemo:
         grasps = []
 
         # 改变姿态，生成抓取动作
-        for Y in yaw_vals:
-            g.grasp_pose.pose.position.y = initial_pose_stamped.pose.position.y-0.15
-            # 欧拉角到四元数的转换
-            q = quaternion_from_euler(3.1415, 0, 1.5707+Y)                
-            # 设置抓取的姿态
-            g.grasp_pose.pose.orientation.x = q[0]
-            g.grasp_pose.pose.orientation.y = q[1]
-            g.grasp_pose.pose.orientation.z = q[2]
-            g.grasp_pose.pose.orientation.w = q[3]
-            
-            # 设置抓取的唯一id号
-            g.id = str(len(grasps))
-            
-            # 设置允许接触的物体
-            g.allowed_touch_objects = allowed_touch_objects
-            
-            # 将本次规划的抓取放入抓取列表中
-            grasps.append(deepcopy(g))
+        #for Y in yaw_vals:
+
+        # 欧拉角到四元数的转换
+        q = quaternion_from_euler(3.1415, 0, 1.5707)                
+        # 设置抓取的姿态
+        g.grasp_pose.pose.orientation.x = q[0]
+        g.grasp_pose.pose.orientation.y = q[1]
+        g.grasp_pose.pose.orientation.z = q[2]
+        g.grasp_pose.pose.orientation.w = q[3]
+        
+        # 设置抓取的唯一id号
+        g.id = str(len(grasps))
+        
+        # 设置允许接触的物体
+        g.allowed_touch_objects = allowed_touch_objects
+        
+        # 将本次规划的抓取放入抓取列表中
+        grasps.append(deepcopy(g))
        
         # 返回抓取列表
         return grasps

@@ -115,17 +115,6 @@ class PickAndPlaceDemo:
         self.setColor(table1_id, 0.8, 0.4, 0, 1.0)
         self.setColor(table2_id, 0.8, 0.4, 0, 1.0)
 
-        #监听目标到base_link的tf变换
-        listener = tf.TransformListener()
-        while not rospy.is_shutdown():
-            try:
-                (trans,rot) = listener.lookupTransform('base_link', 'ar_marker_0', rospy.Time(0))
-                break
-            except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
-                rospy.loginfo("Waiting for transform between 'base_link' and 'ar_marker_0'")
-                rospy.sleep(1)
-
-        rospy.loginfo("Found transform between 'base_link' and 'ar_marker_0'") 
 
         # 设置目标物体的尺寸
         target_size = [0.05, 0.05, 0.1]
@@ -133,13 +122,13 @@ class PickAndPlaceDemo:
         # 设置目标物体的位置
         target_pose = PoseStamped()
         target_pose.header.frame_id = REFERENCE_FRAME
-        target_pose.pose.position.x = trans[0]
-        target_pose.pose.position.y = trans[1]
+        target_pose.pose.position.x = 0
+        target_pose.pose.position.y = 0.5
         target_pose.pose.position.z = 0.015
-        target_pose.pose.orientation.x = rot[0]
-        target_pose.pose.orientation.y = rot[1]
-        target_pose.pose.orientation.z = rot[2]
-        target_pose.pose.orientation.w = rot[3]
+        target_pose.pose.orientation.x = 0
+        target_pose.pose.orientation.y = 0
+        target_pose.pose.orientation.z = 0
+        target_pose.pose.orientation.w = 0
        
         # 将抓取的目标物体加入场景中
         scene.add_box(target_id, target_pose, target_size)
@@ -178,34 +167,34 @@ class PickAndPlaceDemo:
         n_attempts = 0
         
         # 重复尝试抓取，直道成功或者超多最大尝试次数
-        while result != MoveItErrorCodes.SUCCESS and n_attempts < max_pick_attempts:
-            n_attempts += 1
-            rospy.loginfo("Pick attempt: " +  str(n_attempts))
-            result = arm.pick(target_id, grasps)
-            rospy.sleep(0.2)
+       # while result != MoveItErrorCodes.SUCCESS and n_attempts < max_pick_attempts:
+        #    n_attempts += 1
+         #   rospy.loginfo("Pick attempt: " +  str(n_attempts))
+        result = arm.pick(target_id, grasps)
+        rospy.sleep(0.2)
         
         # 如果pick成功，则进入place阶段 
-        if result == MoveItErrorCodes.SUCCESS:
-            result = None
-            n_attempts = 0
+        #if result == MoveItErrorCodes.SUCCESS:
+         #   result = None
+         #   n_attempts = 0
 
             # 生成放置姿态
-            places = self.make_places(place_pose)
+        places = self.make_places(place_pose)
 
             # 重复尝试放置，直道成功或者超多最大尝试次数
-            while result != MoveItErrorCodes.SUCCESS and n_attempts < max_place_attempts:
-                n_attempts += 1
-                rospy.loginfo("Place attempt: " +  str(n_attempts))
-                for place in places:
-                    result = arm.place(target_id, place)
-                    if result == MoveItErrorCodes.SUCCESS:
-                        break
-                rospy.sleep(0.2)
+            #while result != MoveItErrorCodes.SUCCESS and n_attempts < max_place_attempts:
+            #    n_attempts += 1
+             #   rospy.loginfo("Place attempt: " +  str(n_attempts))
+             #   for place in places:
+        result = arm.place(target_id, place)
+             #       if result == MoveItErrorCodes.SUCCESS:
+            #            break
+        rospy.sleep(0.2)
                 
-            if result != MoveItErrorCodes.SUCCESS:
-                rospy.loginfo("Place operation failed after " + str(n_attempts) + " attempts.")
-        else:
-            rospy.loginfo("Pick operation failed after " + str(n_attempts) + " attempts.")
+        #    if result != MoveItErrorCodes.SUCCESS:
+         #       rospy.loginfo("Place operation failed after " + str(n_attempts) + " attempts.")
+      #  else:
+          #  rospy.loginfo("Pick operation failed after " + str(n_attempts) + " attempts.")
                 
         # 控制机械臂回到初始化位置
         arm.set_named_target('home')
@@ -283,15 +272,8 @@ class PickAndPlaceDemo:
         # 设置抓取姿态
         g.grasp_pose = initial_pose_stamped
 
-        rot=(
-            initial_pose_stamped.pose.orientation.x,
-            initial_pose_stamped.pose.orientation.y,
-            initial_pose_stamped.pose.orientation.z,
-            initial_pose_stamped.pose.orientation.w)
-
         # 需要尝试改变姿态的数据列表
         yaw_vals = [0, 0.1, -0.1, 0.2, -0.2, 0.3, -0.3]
-        p = euler_from_quaternion(rot)
         # 抓取姿态的列表
         grasps = []
 
@@ -301,7 +283,7 @@ class PickAndPlaceDemo:
             g.grasp_pose.pose.position.z += 0.18
 
             # 欧拉角到四元数的转换 
-            q = quaternion_from_euler(-pi/2, pi/2, p[2]+Y)            
+            q = quaternion_from_euler(-pi/2, pi/2, Y)            
             # 设置抓取的姿态
             g.grasp_pose.pose.orientation.x = q[0]
             g.grasp_pose.pose.orientation.y = q[1]

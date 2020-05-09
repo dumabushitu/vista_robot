@@ -6,7 +6,7 @@
   <arg name="with_topkinect" default="true"/>
   <arg name="paused" default="false" doc="Starts gazebo in paused mode" />
   <arg name="gui" default="true" doc="Starts gazebo gui" />
-  <arg name="world_name" default="$(find vistar_gazebo)/worlds/simulation.world"/>
+  <arg name="world_name" default="$(find vistar_gazebo)/worlds/simulation_10cm.world"/>
   
   <!-- startup simulated world -->
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
