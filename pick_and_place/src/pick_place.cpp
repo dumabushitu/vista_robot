@@ -9,7 +9,7 @@
 
 void prepare(moveit::planning_interface::MoveGroupInterface& group)
 {
-      if(group.setNamedTarget ("home"))
+      if(group.setNamedTarget ("up"))
 
       {
 
@@ -27,23 +27,43 @@ void prepare(moveit::planning_interface::MoveGroupInterface& group)
 
 void openGripper(trajectory_msgs::JointTrajectory& posture)
 {
-  posture.joint_names.resize(1);
-  posture.joint_names[0] = "gripper_right_driver_joint";
+  posture.joint_names.resize(6);
+  posture.joint_names[0] = "gripper_left_driver_joint";
+  posture.joint_names[1] = "gripper_left_follower_joint";
+  posture.joint_names[2] = "gripper_left_spring_link_joint";
+  posture.joint_names[3] = "gripper_right_driver_joint";
+  posture.joint_names[4] = "gripper_right_follower_joint";
+  posture.joint_names[5] = "gripper_right_spring_link_joint";
 
   posture.points.resize(1);
-  posture.points[0].positions.resize(1);
-  posture.points[0].positions[0] = 0.04;
+  posture.points[0].positions.resize(6);
+  posture.points[0].positions[0] = 0;
+  posture.points[0].positions[1] = 0;
+  posture.points[0].positions[2] = 0;
+  posture.points[0].positions[3] = 0;
+  posture.points[0].positions[4] = 0;
+  posture.points[0].positions[5] = 0;
   posture.points[0].time_from_start = ros::Duration(0.5);
 }
 
 void closedGripper(trajectory_msgs::JointTrajectory& posture)
 {
-  posture.joint_names.resize(1);
-  posture.joint_names[0] = "gripper_right_driver_joint";
+  posture.joint_names.resize(6);
+  posture.joint_names[0] = "gripper_left_driver_joint";
+  posture.joint_names[1] = "gripper_left_follower_joint";
+  posture.joint_names[2] = "gripper_left_spring_link_joint";
+  posture.joint_names[3] = "gripper_right_driver_joint";
+  posture.joint_names[4] = "gripper_right_follower_joint";
+  posture.joint_names[5] = "gripper_right_spring_link_joint";
 
   posture.points.resize(1);
-  posture.points[0].positions.resize(1);
-  posture.points[0].positions[0] = 0.35;
+  posture.points[0].positions.resize(6);
+  posture.points[0].positions[0] = 0;
+  posture.points[0].positions[1] = 0;
+  posture.points[0].positions[2] = 0;
+  posture.points[0].positions[3] = 0.35;
+  posture.points[0].positions[4] = 0;
+  posture.points[0].positions[5] = 0;
   posture.points[0].time_from_start = ros::Duration(0.5);
 
 }
@@ -57,16 +77,16 @@ void pickit(moveit::planning_interface::MoveGroupInterface& group, const geometr
   // 设置抓取姿态
   grasps[0].grasp_pose.header.frame_id = "base_link";
   tf2::Quaternion orientation;
-  orientation.setRPY(M_PI, 0, M_PI/2);
+  orientation.setRPY(-M_PI/2, M_PI/2, 0);
   grasps[0].grasp_pose.pose.orientation = tf2::toMsg(orientation);
   grasps[0].grasp_pose.pose.position.x = marker_pose.position.x;
-  grasps[0].grasp_pose.pose.position.y = marker_pose.position.y-0.15;
-  grasps[0].grasp_pose.pose.position.z = marker_pose.position.z-0.1;
+  grasps[0].grasp_pose.pose.position.y = marker_pose.position.y;
+  grasps[0].grasp_pose.pose.position.z = marker_pose.position.z+0.18;
 
   // 设置 pre-grasp approach
   grasps[0].pre_grasp_approach.direction.header.frame_id = "base_link";
 
-  grasps[0].pre_grasp_approach.direction.vector.y = 1.0;
+  grasps[0].pre_grasp_approach.direction.vector.z = -1.0;
   grasps[0].pre_grasp_approach.min_distance = 0.05;
   grasps[0].pre_grasp_approach.desired_distance = 0.1;
 
@@ -100,13 +120,13 @@ void placeit(moveit::planning_interface::MoveGroupInterface& group)
   // 设置放置的姿态
   place_location[0].place_pose.header.frame_id = "base_link";
   tf2::Quaternion orientation;
-  orientation.setRPY(M_PI, 0, M_PI);
+  orientation.setRPY(-M_PI/2, M_PI/2, M_PI/2);
   place_location[0].place_pose.pose.orientation = tf2::toMsg(orientation); 
 
   //放置对象
-  place_location[0].place_pose.pose.position.x = -0.5;
+  place_location[0].place_pose.pose.position.x = -0.45;
   place_location[0].place_pose.pose.position.y = 0;
-  place_location[0].place_pose.pose.position.z = 0.065;
+  place_location[0].place_pose.pose.position.z = 0.015;
 
   // S设置pre-place approach
   place_location[0].pre_place_approach.direction.header.frame_id = "base_link";
@@ -119,7 +139,7 @@ void placeit(moveit::planning_interface::MoveGroupInterface& group)
 
   place_location[0].post_place_retreat.direction.header.frame_id = "base_link";
 
-  place_location[0].post_place_retreat.direction.vector.x = -1.0;
+  place_location[0].post_place_retreat.direction.vector.z = 1.0;
   place_location[0].post_place_retreat.min_distance = 0.1;
   place_location[0].post_place_retreat.desired_distance = 0.15;
 
@@ -200,13 +220,13 @@ void addCollisionObjects(moveit::planning_interface::PlanningSceneInterface& pla
   collision_objects[2].primitives[0].dimensions.resize(3);
   collision_objects[2].primitives[0].dimensions[0] = 0.05;
   collision_objects[2].primitives[0].dimensions[1] = 0.05;
-  collision_objects[2].primitives[0].dimensions[2] = 0.2;
+  collision_objects[2].primitives[0].dimensions[2] = 0.1;
 
   //定义物块的位置
   collision_objects[2].primitive_poses.resize(1);
   collision_objects[2].primitive_poses[0].position.x = marker_pose.position.x;
   collision_objects[2].primitive_poses[0].position.y = marker_pose.position.y;
-  collision_objects[2].primitive_poses[0].position.z = 0.065;
+  collision_objects[2].primitive_poses[0].position.z = 0.015;
   collision_objects[2].primitive_poses[0].orientation.x = marker_pose.orientation.x;
   collision_objects[2].primitive_poses[0].orientation.y = marker_pose.orientation.y;
   collision_objects[2].primitive_poses[0].orientation.z = marker_pose.orientation.z;

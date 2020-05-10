@@ -19,7 +19,7 @@ GROUP_NAME_ARM = 'arm'
 GROUP_NAME_GRIPPER = 'gripper'
 
 GRIPPER_OPEN = [0,0,0,0,0,0]
-GRIPPER_CLOSED = [0,0,0,0.35,0,0]
+GRIPPER_CLOSED = [0,0,0,0.34,0,0]
 
 REFERENCE_FRAME = 'base_link'
 
@@ -186,7 +186,7 @@ class PickAndPlaceDemo:
             #    n_attempts += 1
              #   rospy.loginfo("Place attempt: " +  str(n_attempts))
              #   for place in places:
-        result = arm.place(target_id, place)
+        result = arm.place(target_id, places[0])
              #       if result == MoveItErrorCodes.SUCCESS:
             #            break
         rospy.sleep(0.2)
