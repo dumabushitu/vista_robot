@@ -1,383 +1,333 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import rospy, sys
+import sys
+import copy
+import rospy
 import moveit_commander
-import tf
-from geometry_msgs.msg import PoseStamped, Pose
-from moveit_commander import MoveGroupCommander, PlanningSceneInterface
-from moveit_msgs.msg import PlanningScene, ObjectColor
-from moveit_msgs.msg import Grasp, GripperTranslation, MoveItErrorCodes
-
-from trajectory_msgs.msg import JointTrajectory, JointTrajectoryPoint
+import moveit_msgs.msg
+import geometry_msgs.msg
+from math import pi
+from std_msgs.msg import String
 from tf.transformations import quaternion_from_euler
 from tf.transformations import euler_from_quaternion
-from math import pi
-from copy import deepcopy
-
-GROUP_NAME_ARM = 'arm'
-GROUP_NAME_GRIPPER = 'gripper'
+from moveit_commander.conversions import pose_to_list
 
 GRIPPER_OPEN = [0,0,0,0,0,0]
-GRIPPER_CLOSED = [0,0,0,0.34,0,0]
+GRIPPER_CLOSED = [0,0,0,0.35,0,0]
 
 REFERENCE_FRAME = 'base_link'
 
-class PickAndPlaceDemo:
-    def __init__(self):
-        # 初始化move_group的API
-        moveit_commander.roscpp_initialize(sys.argv)
-        
-        # 初始化ROS节点
-        rospy.init_node('pick_and_place_demo')
-        
-        # 初始化场景对象
-        scene = PlanningSceneInterface()
-        
-        # 创建一个发布场景变化信息的发布者
-        self.scene_pub = rospy.Publisher('planning_scene', PlanningScene, queue_size=10)
-        
-        # 创建一个发布抓取姿态的发布者
-        self.gripper_pose_pub = rospy.Publisher('gripper_pose', PoseStamped, queue_size=10)
-        
-        # 创建一个存储物体颜色的字典对象
-        self.colors = dict()
+class PickandPlace(object):
+  def __init__(self):
+    super(MoveGroupPythonIntefaceTutorial, self).__init__()
+    ## 首先初始化`moveit_commander`和 `rospy`_ node:
+    moveit_commander.roscpp_initialize(sys.argv)
+    rospy.init_node('pick_and_place_demo',anonymous=True)
+
+    ## 初始化一个`RobotCommander`对象. 
+    robot = moveit_commander.RobotCommander()
+
+    ## 初始化一个`PlanningSceneInterface`对象
+    scene = moveit_commander.PlanningSceneInterface()
+
+    ## 初始化 一个`MoveGroupCommander`对象.  T
+    group_name = "arm"
+    group = moveit_commander.MoveGroupCommander(group_name)
+
+    ## 创建一个 `DisplayTrajectory`发布者 用来在rviz可视化轨迹
+    display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
+                                                   moveit_msgs.msg.DisplayTrajectory,
+                                                   queue_size=20)
+
                         
-        # 初始化需要使用move group控制的机械臂中的arm group
-        arm = MoveGroupCommander(GROUP_NAME_ARM)
-        
-        # 初始化需要使用move group控制的机械臂中的gripper group
-        gripper = MoveGroupCommander(GROUP_NAME_GRIPPER)
- 
-        # 设置位置(单位：米)和姿态（单位：弧度）的允许误差
-        arm.set_goal_position_tolerance(0.05)
-        arm.set_goal_orientation_tolerance(0.1)
+    #获取调试信息
+    # 获取机器人的参考坐标系:
+    planning_frame = group.get_planning_frame()
+    print "============ Reference frame: %s" % planning_frame
 
-        # 当运动规划失败后，允许重新规划
-        arm.allow_replanning(True)
+    # 打印规划组终端link的名字:
+    eef_link = group.get_end_effector_link()
+    print "============ End effector: %s" % eef_link
 
-        # 设置目标位置所使用的参考坐标系
-        arm.set_pose_reference_frame(REFERENCE_FRAME)
-        
-        # 设置每次运动规划的时间限制：20s
-        arm.set_planning_time(20)
-        
-        # 设置pick和place阶段的最大尝试次数
-        max_pick_attempts = 5
-        max_place_attempts = 5
-        rospy.sleep(2)
+    # 获取机器人的所有规划组:
+    group_names = robot.get_group_names()
+    print "============ Robot Groups:", robot.get_group_names()
 
-        # 设置场景物体的名称 
-        table1_id = 'table1'
-        table2_id = 'table2'
-        target_id = 'cube_marker'
-                
-        # 移除场景中之前运行残留的物体
-        scene.remove_world_object(table1_id)
-        scene.remove_world_object(table2_id)
-        scene.remove_world_object(target_id)
-        
-        # 移除场景中之前与机器臂绑定的物体
-        scene.remove_attached_object('ee_link', target_id)  
-        rospy.sleep(1)
-        
-        # 控制机械臂先运动到准备位置
-        arm.set_named_target('up')
-        arm.go()
-        
-        # 控制夹爪张开
-        gripper.set_joint_value_target(GRIPPER_OPEN)
-        gripper.go()
-        rospy.sleep(1)
-
-        # 将两张桌子加入场景当中
-        table1_size = [0.8, 1.5, 0.03]
-        table2_size = [1.5, 0.8, 0.03]
-        
-        # 设置table1和table2的三维尺寸[长, 宽, 高]
-        table1_pose = PoseStamped()
-        table1_pose.header.frame_id = REFERENCE_FRAME
-        table1_pose.pose.position.x = 0
-        table1_pose.pose.position.y = 1.05
-        table1_pose.pose.position.z = -0.05
-        table1_pose.pose.orientation.w = 1.0
-        scene.add_box(table1_id, table1_pose, table1_size)
-
-        table2_pose = PoseStamped()
-        table2_pose.header.frame_id = REFERENCE_FRAME
-        table2_pose.pose.position.x = -1.05
-        table2_pose.pose.position.y = -0.1
-        table2_pose.pose.position.z = -0.05
-        table2_pose.pose.orientation.w = 1.0
-        scene.add_box(table2_id, table2_pose, table2_size)
-                             
-        # 将桌子设置成红色
-        self.setColor(table1_id, 0.8, 0.4, 0, 1.0)
-        self.setColor(table2_id, 0.8, 0.4, 0, 1.0)
+    # 获取机器人的当前状态
+    print "============ Printing robot state"
+    print robot.get_current_state()
+    print ""
 
 
-        # 设置目标物体的尺寸
-        target_size = [0.05, 0.05, 0.1]
-        
-        # 设置目标物体的位置
-        target_pose = PoseStamped()
-        target_pose.header.frame_id = REFERENCE_FRAME
-        target_pose.pose.position.x = 0
-        target_pose.pose.position.y = 0.5
-        target_pose.pose.position.z = 0.015
-        target_pose.pose.orientation.x = 0
-        target_pose.pose.orientation.y = 0
-        target_pose.pose.orientation.z = 0
-        target_pose.pose.orientation.w = 0
-       
-        # 将抓取的目标物体加入场景中
-        scene.add_box(target_id, target_pose, target_size)
-        
-        # 将目标物体设置为黄色
-        self.setColor(target_id, 0.9, 0.9, 0, 1.0)
-        
-        # 将场景中的颜色设置发布
-        self.sendColors()
-        
+    #各种取值
+    self.target_id = 'cube_marker'
+    self.target_pose = PoseStamped()
+    self.robot = robot
+    self.scene = scene
+    self.group = group
+    self.display_trajectory_publisher = display_trajectory_publisher
+    self.planning_frame = planning_frame
+    self.eef_link = eef_link
+    self.group_names = group_names
 
-        # 设置支持的外观
-        arm.set_support_surface_name(table2_id)
-        
-        # 设置一个place阶段需要放置物体的目标位置
-        place_pose = PoseStamped()
-        place_pose.header.frame_id = REFERENCE_FRAME
-        place_pose.pose.position.x =  -0.4
-        place_pose.pose.position.y =  0.1
-        place_pose.pose.position.z =  0.015
+  def prepare(self):
 
-
-        # 将目标位置设置为机器人的抓取目标位置
-        grasp_pose = target_pose
-                
-        # 生成抓取姿态
-        grasps = self.make_grasps(grasp_pose, [target_id])
-
-        # 将抓取姿态发布，可以在rviz中显示
-        for grasp in grasps:
-            self.gripper_pose_pub.publish(grasp.grasp_pose)
-            rospy.sleep(0.2)
-    
-        # 追踪抓取成功与否，以及抓取的尝试次数
-        result = None
-        n_attempts = 0
-        
-        # 重复尝试抓取，直道成功或者超多最大尝试次数
-       # while result != MoveItErrorCodes.SUCCESS and n_attempts < max_pick_attempts:
-        #    n_attempts += 1
-         #   rospy.loginfo("Pick attempt: " +  str(n_attempts))
-        result = arm.pick(target_id, grasps)
-        rospy.sleep(0.2)
-        
-        # 如果pick成功，则进入place阶段 
-        #if result == MoveItErrorCodes.SUCCESS:
-         #   result = None
-         #   n_attempts = 0
-
-            # 生成放置姿态
-        places = self.make_places(place_pose)
-
-            # 重复尝试放置，直道成功或者超多最大尝试次数
-            #while result != MoveItErrorCodes.SUCCESS and n_attempts < max_place_attempts:
-            #    n_attempts += 1
-             #   rospy.loginfo("Place attempt: " +  str(n_attempts))
-             #   for place in places:
-        result = arm.place(target_id, places[0])
-             #       if result == MoveItErrorCodes.SUCCESS:
-            #            break
-        rospy.sleep(0.2)
-                
-        #    if result != MoveItErrorCodes.SUCCESS:
-         #       rospy.loginfo("Place operation failed after " + str(n_attempts) + " attempts.")
-      #  else:
-          #  rospy.loginfo("Pick operation failed after " + str(n_attempts) + " attempts.")
-                
-        # 控制机械臂回到初始化位置
-        arm.set_named_target('home')
-        arm.go()
-        
-        # 控制夹爪回到张开的状态
-        gripper.set_joint_value_target(GRIPPER_OPEN)
-        gripper.go()
-        rospy.sleep(1)
-
-        # 关闭并退出moveit
-        moveit_commander.roscpp_shutdown()
-        moveit_commander.os._exit(0)
-        
-    # 创建夹爪的姿态数据JointTrajectory
-    def make_gripper_posture(self, joint_positions):
-        # 初始化夹爪的关节运动轨迹
-        t = JointTrajectory()
-        
-        # 设置夹爪的关节名称
-        t.joint_names = ['gripper_left_driver_joint', 'gripper_left_follower_joint', 'gripper_left_spring_link_joint',
-  'gripper_right_driver_joint', 'gripper_right_follower_joint', 'gripper_right_spring_link_joint']
-        
-        # 初始化关节轨迹点
-        tp = JointTrajectoryPoint()
-        
-        # 将输入的关节位置作为一个目标轨迹点
-        tp.positions = joint_positions
-        
-        # 设置夹爪的力度
-        tp.effort = [5.0]
-        
-        # 设置运动时间
-        tp.time_from_start = rospy.Duration(1.0)
-        
-        # 将目标轨迹点加入到运动轨迹中
-        t.points.append(tp)
-        
-        # 返回夹爪的关节运动轨迹
-        return t
-    
-    # 使用给定向量创建夹爪的translation结构
-    def make_gripper_translation(self, min_dist, desired, vector):
-        # 初始化translation对象
-        g = GripperTranslation()
-        
-        # 设置方向向量
-        g.direction.vector.x = vector[0]
-        g.direction.vector.y = vector[1]
-        g.direction.vector.z = vector[2]
-        
-        # 设置参考坐标系
-        g.direction.header.frame_id = REFERENCE_FRAME
-        
-        # 设置最小和期望的距离
-        g.min_distance = min_dist
-        g.desired_distance = desired
-        
-        return g
-
-    # 创建一个允许的的抓取姿态列表
-    def make_grasps(self, initial_pose_stamped, allowed_touch_objects):
-        # 初始化抓取姿态对象
-        g = Grasp()
-        
-        # 创建夹爪张开、闭合的姿态
-        g.pre_grasp_posture = self.make_gripper_posture(GRIPPER_OPEN)
-
-        g.grasp_posture = self.make_gripper_posture(GRIPPER_CLOSED)
-                
-        # 设置期望的夹爪靠近、撤离目标的参数
-        g.pre_grasp_approach = self.make_gripper_translation(0.05, 0.1, [0.0, 0.0, -1.0])
-        g.post_grasp_retreat = self.make_gripper_translation(0.05, 0.1, [0.0, 0.0, 1.0])
-        
-        # 设置抓取姿态
-        g.grasp_pose = initial_pose_stamped
-
-        # 需要尝试改变姿态的数据列表
-        yaw_vals = [0, 0.1, -0.1, 0.2, -0.2, 0.3, -0.3]
-        # 抓取姿态的列表
-        grasps = []
-
-        # 改变姿态，生成抓取动作
-        for Y in yaw_vals:
-
-            g.grasp_pose.pose.position.z += 0.18
-
-            # 欧拉角到四元数的转换 
-            q = quaternion_from_euler(-pi/2, pi/2, Y)            
-            # 设置抓取的姿态
-            g.grasp_pose.pose.orientation.x = q[0]
-            g.grasp_pose.pose.orientation.y = q[1]
-            g.grasp_pose.pose.orientation.z = q[2]
-            g.grasp_pose.pose.orientation.w = q[3]
+    table1_id = 'table1'
+    table2_id = 'table2'
+    target_id = self.target_id
             
-            # 设置抓取的唯一id号
-            g.id = str(len(grasps))
-            
-            # 设置允许接触的物体
-            g.allowed_touch_objects = allowed_touch_objects
-            
-            # 将本次规划的抓取放入抓取列表中
-            grasps.append(deepcopy(g))
-       
-        # 返回抓取列表
-        return grasps
+    # 移除场景中之前运行残留的物体
+    scene.remove_world_object(table1_id)
+    scene.remove_world_object(table2_id)
+    scene.remove_world_object(target_id)
     
-    # 创建一个允许的放置姿态列表
-    def make_places(self, init_pose):
-        # 初始化放置抓取物体的位置
-        place = PoseStamped()
-        
-        # 设置放置抓取物体的位置
-        place = init_pose
-        
-        # 定义x方向上用于尝试放置物体的偏移参数
-        x_vals = [0, 0.005, 0.01, 0.015, -0.005, -0.01, -0.015]
-        
-        # 定义y方向上用于尝试放置物体的偏移参数
-        y_vals = [0, 0.005, 0.01, 0.015, -0.005, -0.01, -0.015]
-        
-        pitch_vals = [0]
-        
-        # 定义用于尝试放置物体的偏航角参数
-        yaw_vals = [0]
-
-        # 定义放置物体的姿态列表
-        places = []
-        
-        # 生成每一个角度和偏移方向上的抓取姿态
-        #for Y in yaw_vals:
-           # for p in pitch_vals:
-        for y in y_vals:
-            for x in x_vals:
-                place.pose.position.x = init_pose.pose.position.x + x
-                place.pose.position.y = init_pose.pose.position.y + y
-                
-                # 欧拉角到四元数的转换
-                q = quaternion_from_euler(-pi/2, pi/2, pi/2)
-                
-                # 欧拉角到四元数的转换
-                place.pose.orientation.x = q[0]
-                place.pose.orientation.y = q[1]
-                place.pose.orientation.z = q[2]
-                place.pose.orientation.w = q[3]
-                
-                # 将该放置姿态加入列表
-                places.append(deepcopy(place))
-        
-        # 返回放置物体的姿态列表
-        return places
+    # 移除场景中之前与机器臂绑定的物体
+    scene.remove_attached_object('tool0',target_id )  
+    rospy.sleep(1)
     
-    # 设置场景物体的颜色
-    def setColor(self, name, r, g, b, a = 0.9):
-        # 初始化moveit颜色对象
-        color = ObjectColor()
-        
-        # 设置颜色值
-        color.id = name
-        color.color.r = r
-        color.color.g = g
-        color.color.b = b
-        color.color.a = a
-        
-        # 更新颜色字典
-        self.colors[name] = color
+    group = self.group
 
-    # 将颜色设置发送并应用到moveit场景当中
-    def sendColors(self):
-        # 初始化规划场景对象
-        p = PlanningScene()
+    # 设置位置(单位：米)和姿态（单位：弧度）的允许误差
+    group.set_goal_position_tolerance(0.01)
+    group.set_goal_orientation_tolerance(0.05)
 
-        # 需要设置规划场景是否有差异     
-        p.is_diff = True
-        
-        # 从颜色字典中取出颜色设置
-        for color in self.colors.values():
-            p.object_colors.append(color)
-        
-        # 发布场景物体颜色设置
-        self.scene_pub.publish(p)
-
-if __name__ == "__main__":
-    PickAndPlaceDemo()
-
+    # 控制机械臂先运动到准备位置
+    group.set_named_target('up')
+    group.go()
     
+    # 控制夹爪张开
+    gripper.set_joint_value_target(GRIPPER_OPEN)
+    gripper.go()
+    rospy.sleep(1)
+    group = self.group
+
+  def add_collisions(self):
+    scene = self.scene
+    target_id = self.target_id
+    # 将两张桌子加入场景当中
+    table1_size = [0.8, 1.5, 0.03]
+    table2_size = [1.5, 0.8, 0.03]
+    
+    # 设置table1和table2的三维尺寸[长, 宽, 高]
+    table1_pose = PoseStamped()
+    table1_pose.header.frame_id = REFERENCE_FRAME
+    table1_pose.pose.position.x = 0
+    table1_pose.pose.position.y = 1.05
+    table1_pose.pose.position.z = -0.05
+    table1_pose.pose.orientation.w = 1.0
+    scene.add_box(table1_id, table1_pose, table1_size)
+
+    table2_pose = PoseStamped()
+    table2_pose.header.frame_id = REFERENCE_FRAME
+    table2_pose.pose.position.x = -1.05
+    table2_pose.pose.position.y = -0.1
+    table2_pose.pose.position.z = -0.05
+    table2_pose.pose.orientation.w = 1.0
+    scene.add_box(table2_id, table2_pose, table2_size)
+
+    #监听目标到base_link的tf变换
+    listener = tf.TransformListener()
+    while not rospy.is_shutdown():
+        try:
+            (trans,rot) = listener.lookupTransform('base_link', 'ar_marker_0', rospy.Time(0))
+            break
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            rospy.loginfo("Waiting for transform between 'base_link' and 'ar_marker_0'")
+            rospy.sleep(1)
+
+    rospy.loginfo("Found transform between 'base_link' and 'ar_marker_0'") 
+
+    # 设置目标物体的尺寸
+    target_size = [0.05, 0.05, 0.1]
+    
+    # 设置目标物体的位置
+    target_pose = PoseStamped()
+    target_pose.header.frame_id = REFERENCE_FRAME
+    target_pose.pose.position.x = trans[0]
+    target_pose.pose.position.y = trans[1]
+    target_pose.pose.position.z = 0.015
+    target_pose.pose.orientation.x = rot[0]
+    target_pose.pose.orientation.y = rot[1]
+    target_pose.pose.orientation.z = rot[2]
+    target_pose.pose.orientation.w = rot[3]
+    self.target_pose = target_pose
+    
+    # 将抓取的目标物体加入场景中
+    scene.add_box(target_id, target_pose, target_size)
+
+    return self.wait_for_state_update(box_is_known=True, timeout=4)
+  
+
+    def go_to_pose_goal(self):
+    group = self.group
+
+    # 设置位置(单位：米)和姿态（单位：弧度）的允许误差
+    group.set_goal_position_tolerance(0.01)
+    group.set_goal_orientation_tolerance(0.05)
+
+    pose_goal = self.target_pose
+
+    rot=(
+    pose_goal.pose.orientation.x,
+    pose_goal.pose.orientation.y,
+    pose_goal.pose.orientation.z,
+    pose_goal.pose.orientation.w)
+
+    p = euler_from_quaternion(rot)
+    q = quaternion_from_euler(pi, 0, p[2])  
+
+    pose_goal = PoseStamped()
+    pose_goal.position.z += 0.28
+    pose_goal.orientation.x = q[0]
+    pose_goal.orientation.y = q[1]
+    pose_goal.orientation.z = q[2]
+    pose_goal.orientation.w = q[3]
+
+    group.set_pose_target(pose_goal)
+    
+    # 规划运动路径
+    traj = group.plan()
+        
+    # 按照规划的运动路径控制机械臂运动
+    group.execute(traj)
+    rospy.sleep(1)
+
+  def plan_cartesian_path(self,vector,desire):
+    group = self.group
+
+    waypoints = []
+
+    wpose = group.get_current_pose().pose
+    wpose.position.x =  vector[0] * desire[0]
+    wpose.position.y =  vector[1] * desire[1]
+    wpose.position.z =  vector[2] * desire[2]  
+    waypoints.append(copy.deepcopy(wpose))
+
+    (plan, fraction) = group.compute_cartesian_path(
+                                       waypoints,   # 路点列表
+                                       0.01,        # 终端步进值
+                                       0.0)         # 跳跃阈值
+
+    return plan, fraction
+
+  def display_trajectory(self, plan):
+    robot = self.robot
+    display_trajectory_publisher = self.display_trajectory_publisher
+    display_trajectory = moveit_msgs.msg.DisplayTrajectory()
+    display_trajectory.trajectory_start = robot.get_current_state()
+    display_trajectory.trajectory.append(plan)
+    display_trajectory_publisher.publish(display_trajectory);
+
+  
+  def wait_for_state_update(self, box_is_known=False, box_is_attached=False, timeout=4):
+    target_id = self.target_id
+    scene = self.scene
+    start = rospy.get_time()
+    seconds = rospy.get_time()
+    while (seconds - start < timeout) and not rospy.is_shutdown():
+        # 查看目标是否在连接列表
+        attached_objects = scene.get_attached_objects([target_id])
+        is_attached = len(attached_objects.keys()) > 0
+
+        # 查看目标是否在场景中
+        is_known = target_id in scene.get_known_object_names()
+
+        # 查看是否是我们期望的状态
+        if (box_is_attached == is_attached) and (box_is_known == is_known):
+        return True
+
+        rospy.sleep(0.1)
+        seconds = rospy.get_time()
+
+    return False
+
+  def attach_box(self, timeout=4):
+    target_id = self.target_id
+    robot = self.robot
+    scene = self.scene
+    eef_link = self.eef_link
+    group_names = self.group_names
+
+    grasping_group = 'gripper'
+    gripper.set_named_target('close')
+    gripper.go
+    sleep(2)
+
+    touch_links = robot.get_link_names(group=grasping_group)
+    scene.attach_box(eef_link, target_id, touch_links=touch_links)
+
+    return self.wait_for_state_update(box_is_attached=True, box_is_known=False, timeout=timeout)
+
+  def detach_box(self, timeout=4):
+    # Copy class variables to local variables to make the web tutorials more clear.
+    # In practice, you should use the class variables directly unless you have a good
+    # reason not to.
+    box_name = self.box_name
+    scene = self.scene
+    eef_link = self.eef_link
+
+    ## BEGIN_SUB_TUTORIAL detach_object
+    ##
+    ## Detaching Objects from the Robot
+    ## ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ## We can also detach and remove the object from the planning scene:
+    scene.remove_attached_object(eef_link, name=box_name)
+    ## END_SUB_TUTORIAL
+
+    # We wait for the planning scene to update.
+    return self.wait_for_state_update(box_is_known=True, box_is_attached=False, timeout=timeout)
+
+
+def main():
+  try:
+    print "============ Press `Enter` to begin the tutorial by setting up the moveit_commander (press ctrl-d to exit) ..."
+    raw_input()
+    tutorial = MoveGroupPythonIntefaceTutorial()
+
+    print "============ Press `Enter` to execute a movement using a joint state goal ..."
+    raw_input()
+    tutorial.go_to_joint_state()
+
+    print "============ Press `Enter` to execute a movement using a pose goal ..."
+    raw_input()
+    tutorial.go_to_pose_goal()
+
+    print "============ Press `Enter` to plan and display a Cartesian path ..."
+    raw_input()
+    cartesian_plan, fraction = tutorial.plan_cartesian_path()
+
+    print "============ Press `Enter` to display a saved trajectory (this will replay the Cartesian path)  ..."
+    raw_input()
+    tutorial.display_trajectory(cartesian_plan)
+
+    print "============ Press `Enter` to execute a saved path ..."
+    raw_input()
+    tutorial.execute_plan(cartesian_plan)
+
+    print "============ Press `Enter` to add a box to the planning scene ..."
+    raw_input()
+    tutorial.add_box()
+
+    print "============ Press `Enter` to attach a Box to the Panda robot ..."
+    raw_input()
+    tutorial.attach_box()
+
+    print "============ Press `Enter` to plan and execute a path with an attached collision object ..."
+    raw_input()
+    cartesian_plan, fraction = tutorial.plan_cartesian_path(scale=-1)
+    tutorial.execute_plan(cartesian_plan)
+
+    print "============ Press `Enter` to detach the box from the Panda robot ..."
+    raw_input()
+    tutorial.detach_box()
+
+    print "============ Press `Enter` to remove the box from the planning scene ..."
+    raw_input()
+    tutorial.remove_box()
+
+    print "============ Python tutorial demo complete!"
+  except rospy.ROSInterruptException:
+    return
+  except KeyboardInterrupt:
+    return
+
+if __name__ == '__main__':
+  main()

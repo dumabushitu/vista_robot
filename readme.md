@@ -5,7 +5,9 @@
 该功能包使用了ur3机械臂和robotiq作为其末端执行器。搭建了urdf模型及其仿真环境，进行了moveit配置，同时使用了ar_track_alvar用于识别ar标签进行pick和place实验。
 
 仿真环境里识别精度：通过比较gazebo里实际立方体的位置和rviz里经过tf变换得到的位置，识别误差在0.001m左右。
-未完成部分: pick and place，进行了两种pick方案，对于20cm高立方体采用从侧面抓取，对于10cm立方体采用从上方抓取，均未成功最后没有添加判断条件合并代码。进行pick时，在机械臂末端绑定了立方体后会报错
+pick and place进行了两种方案，对于20cm高立方体采用从侧面抓取，对于10cm立方体采用从上方抓取，c++代码rviz里演示成功，但是gazebo里抓取物块时，物块会抖动或者脱落，设置有摩擦，原因未知。
+
+python版本进行pick时，在机械臂末端绑定了立方体后会报错
 ```
 Attempting to attach object 'cube_marker' to link 'ee_link' but no geometry specified and such an object does not exist in the collision world
 ```
@@ -13,13 +15,15 @@ Attempting to attach object 'cube_marker' to link 'ee_link' but no geometry spec
 ```
 Attempting to attach object 'cube_marker' to link 'panda_link8' but no geometry specified and such an object does not exist in the collision world
 ```
-查询资料有遇到跟我同样错误的人，但是无可参考的解决方案。
+查询资料有遇到同样错误的人，但是无可参考的解决方案。
+
 ## 使用方法
 
 1. 启动仿真环境（加载仿真环境，加载机器人，加载控制器插件，加载标签检测节点）
+- 两种物块的仿真环境还未合并，防止再次引起不必要的错误,配置完ikfast会尝试，可以在launch文件里更改world参数
 
 ```
-roslaunch vistar_gazebo  simulation_10cm.launch
+roslaunch vistar_gazebo  vistar_simulation.launch
 ```
 
 2. 启动moveit（启动move_group,启动rviz）
@@ -29,6 +33,11 @@ roslaunch vistar_moveit_config vistar_moveit_planning_execution.launch
 ```
 
 ​3.进行抓取放置
+- c++
+```
+rosrun pick_and_place pick_place_node
+```
+- python
 
 ```
 rosrun pick_and_place pick_place_10cm.py

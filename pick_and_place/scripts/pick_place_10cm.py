@@ -78,7 +78,7 @@ class PickAndPlaceDemo:
         scene.remove_world_object(target_id)
         
         # 移除场景中之前与机器臂绑定的物体
-        scene.remove_attached_object('ee_link', target_id)  
+        scene.remove_attached_object('tool0', target_id)  
         rospy.sleep(1)
         
         # 控制机械臂先运动到准备位置
@@ -91,23 +91,23 @@ class PickAndPlaceDemo:
         rospy.sleep(1)
 
         # 将两张桌子加入场景当中
-        table1_size = [0.8, 1.5, 0.03]
-        table2_size = [1.5, 0.8, 0.03]
+        table1_size = [0.4, 0.2, 0.4]
+        table2_size = [0.2, 0.4, 0.4]
         
         # 设置table1和table2的三维尺寸[长, 宽, 高]
         table1_pose = PoseStamped()
         table1_pose.header.frame_id = REFERENCE_FRAME
         table1_pose.pose.position.x = 0
-        table1_pose.pose.position.y = 1.05
-        table1_pose.pose.position.z = -0.05
+        table1_pose.pose.position.y = 0.45
+        table1_pose.pose.position.z = -0.25
         table1_pose.pose.orientation.w = 1.0
         scene.add_box(table1_id, table1_pose, table1_size)
 
         table2_pose = PoseStamped()
         table2_pose.header.frame_id = REFERENCE_FRAME
-        table2_pose.pose.position.x = -1.05
-        table2_pose.pose.position.y = -0.1
-        table2_pose.pose.position.z = -0.05
+        table2_pose.pose.position.x = -0.45
+        table2_pose.pose.position.y = 0
+        table2_pose.pose.position.z = -0.25
         table2_pose.pose.orientation.w = 1.0
         scene.add_box(table2_id, table2_pose, table2_size)
                              
@@ -135,7 +135,7 @@ class PickAndPlaceDemo:
         target_pose.header.frame_id = REFERENCE_FRAME
         target_pose.pose.position.x = trans[0]
         target_pose.pose.position.y = trans[1]
-        target_pose.pose.position.z = 0.015
+        target_pose.pose.position.z = 0
         target_pose.pose.orientation.x = rot[0]
         target_pose.pose.orientation.y = rot[1]
         target_pose.pose.orientation.z = rot[2]
@@ -157,10 +157,9 @@ class PickAndPlaceDemo:
         # 设置一个place阶段需要放置物体的目标位置
         place_pose = PoseStamped()
         place_pose.header.frame_id = REFERENCE_FRAME
-        place_pose.pose.position.x =  -0.4
-        place_pose.pose.position.y =  0.1
-        place_pose.pose.position.z =  0.015
-
+        place_pose.pose.position.x =  -0.45
+        place_pose.pose.position.y =  0.0
+        place_pose.pose.position.z =  0
 
         # 将目标位置设置为机器人的抓取目标位置
         grasp_pose = target_pose
@@ -301,7 +300,7 @@ class PickAndPlaceDemo:
             g.grasp_pose.pose.position.z += 0.18
 
             # 欧拉角到四元数的转换 
-            q = quaternion_from_euler(-pi/2, pi/2, p[2]+Y)            
+            q = quaternion_from_euler(pi, 0, p[2]+Y)            
             # 设置抓取的姿态
             g.grasp_pose.pose.orientation.x = q[0]
             g.grasp_pose.pose.orientation.y = q[1]
@@ -351,7 +350,7 @@ class PickAndPlaceDemo:
                 place.pose.position.y = init_pose.pose.position.y + y
                 
                 # 欧拉角到四元数的转换
-                q = quaternion_from_euler(-pi/2, pi/2, pi/2)
+                q = quaternion_from_euler(0, 0, pi/2)
                 
                 # 欧拉角到四元数的转换
                 place.pose.orientation.x = q[0]

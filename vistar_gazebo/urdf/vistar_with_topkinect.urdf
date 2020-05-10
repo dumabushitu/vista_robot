@@ -330,9 +330,9 @@
         <child link="tool0" />
     </joint>
     <!-- base -->
-    <joint name="ee_link_gripper_base_joint" type="fixed">
-        <origin rpy="1.57079632679 1.57079632679 1.57079632679" xyz="0 0 0" />
-        <parent link="ee_link" />
+    <joint name="tool0_gripper_base_joint" type="fixed">
+        <origin rpy="0 0 1.57079632679" xyz="0 0 0" />
+        <parent link="tool0" />
         <child link="gripper_base" />
     </joint>
     <link name="gripper_base">
@@ -350,15 +350,8 @@
             </geometry>
         </visual>
         <collision>
-            <origin rpy="0 0 0" xyz="0 0 0.015" />
             <geometry>
-                <cylinder length="0.045" radius="0.04" />
-            </geometry>
-        </collision>
-        <collision>
-            <origin rpy="0 0 0" xyz="0 0 0.06" />
-            <geometry>
-                <box size="0.03 0.03 0.06" />
+                <mesh filename="package://robotiq_2f_85_gripper_description/meshes/collision/base.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -384,9 +377,8 @@
             </geometry>
         </visual>
         <collision>
-            <origin rpy="-0.1 0 0" xyz="0 0.01 0" />
             <geometry>
-                <box size="0.002 0.004 0.002" />
+                <mesh filename="package://robotiq_2f_85_gripper_description/meshes/collision/driver.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -409,9 +401,8 @@
             </geometry>
         </visual>
         <collision>
-            <origin rpy="-1.7 0 0" xyz="0 0.0 0.025" />
             <geometry>
-                <box size="0.03 0.065 0.02" />
+                <mesh filename="package://robotiq_2f_85_gripper_description/meshes/collision/coupler.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -437,9 +428,8 @@
             </geometry>
         </visual>
         <collision>
-            <origin rpy="0 0 0" xyz="0 -0.01 0.022" />
             <geometry>
-                <box size="0.002 0.0015 0.0048" />
+                <mesh filename="package://robotiq_2f_85_gripper_description/meshes/collision/follower.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -461,9 +451,8 @@
             </geometry>
         </visual>
         <collision>
-            <origin rpy="0 0 0" xyz="0 -0.022 0.031" />
             <geometry>
-                <box size="0.02 0.008 0.036" />
+                <mesh filename="package://robotiq_2f_85_gripper_description/meshes/collision/pad.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -489,9 +478,8 @@
             </geometry>
         </visual>
         <collision>
-            <origin rpy="-0.7068 0 0" xyz="0 0.025 0.015" />
             <geometry>
-                <box size="0.004 0.002 0.0065" />
+                <mesh filename="package://robotiq_2f_85_gripper_description/meshes/collision/spring_link.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -518,9 +506,8 @@
             </geometry>
         </visual>
         <collision>
-            <origin rpy="-0.1 0 0" xyz="0 0.01 0" />
             <geometry>
-                <box size="0.002 0.004 0.002" />
+                <mesh filename="package://robotiq_2f_85_gripper_description/meshes/collision/driver.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -543,9 +530,8 @@
             </geometry>
         </visual>
         <collision>
-            <origin rpy="-1.7 0 0" xyz="0 0.0 0.025" />
             <geometry>
-                <box size="0.03 0.065 0.02" />
+                <mesh filename="package://robotiq_2f_85_gripper_description/meshes/collision/coupler.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -571,9 +557,8 @@
             </geometry>
         </visual>
         <collision>
-            <origin rpy="0 0 0" xyz="0 -0.01 0.022" />
             <geometry>
-                <box size="0.002 0.0015 0.0048" />
+                <mesh filename="package://robotiq_2f_85_gripper_description/meshes/collision/follower.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -595,9 +580,8 @@
             </geometry>
         </visual>
         <collision>
-            <origin rpy="0 0 0" xyz="0 -0.022 0.031" />
             <geometry>
-                <box size="0.02 0.008 0.036" />
+                <mesh filename="package://robotiq_2f_85_gripper_description/meshes/collision/pad.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>
@@ -623,9 +607,8 @@
             </geometry>
         </visual>
         <collision>
-            <origin rpy="-0.7068 0 0" xyz="0 0.025 0.015" />
             <geometry>
-                <box size="0.004 0.002 0.0065" />
+                <mesh filename="package://robotiq_2f_85_gripper_description/meshes/collision/spring_link.stl" scale="0.001 0.001 0.001" />
             </geometry>
         </collision>
     </link>

@@ -46,7 +46,7 @@ class MoveItIkDemo:
         target_pose = PoseStamped()
         target_pose.header.frame_id = reference_frame
         target_pose.header.stamp = rospy.Time.now()   
-        q = quaternion_from_euler(-pi/2, pi/2, 0)  
+        q = quaternion_from_euler(pi, 0, 0)  
         target_pose.pose.position.x = 0
         target_pose.pose.position.y = 0.4
         target_pose.pose.position.z = 0.15
