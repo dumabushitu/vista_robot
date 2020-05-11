@@ -85,10 +85,10 @@
       <heading_deg>0</heading_deg>
     </spherical_coordinates>
     <state world_name='default'>
-      <sim_time>3411 910000000</sim_time>
-      <real_time>70 742331870</real_time>
-      <wall_time>1589129841 687281587</wall_time>
-      <iterations>56497</iterations>
+      <sim_time>5290 389000000</sim_time>
+      <real_time>202 321318413</real_time>
+      <wall_time>1589164793 333315579</wall_time>
+      <iterations>157041</iterations>
       <model name='box'>
         <pose frame=''>0 0.5 0.2 0 -0 0</pose>
         <scale>1 1 1</scale>
@@ -100,23 +100,33 @@
         </link>
       </model>
       <model name='box_0'>
-        <pose frame=''>-0.5 0 0.2 0 -0 1.5707</pose>
+        <pose frame=''>-0.5 0 0.2 0 0 -1.5707</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>-0.5 0 0.2 0 -0 1.5707</pose>
+          <pose frame=''>-0.5 0 0.2 0 0 -1.5707</pose>
           <velocity>0 0 0 0 -0 0</velocity>
           <acceleration>0 0 0 0 -0 0</acceleration>
           <wrench>0 0 0 0 -0 0</wrench>
         </link>
       </model>
       <model name='cube_marker'>
-        <pose frame=''>0.0879 0.559391 0.497635 -0.00489 0.00056 -1.50438</pose>
+        <pose frame=''>-0.040103 0.477065 0.44805 -0.000542 0.021721 -1.49302</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>0.0879 0.559391 0.497635 -0.00489 0.00056 -1.50438</pose>
+          <pose frame=''>-0.040103 0.477065 0.44805 -0.000542 0.021721 -1.49302</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>-1e-06 1e-06 -1e-06 -1.1e-05 -6e-06 0</acceleration>
-          <wrench>-0 0 -0 0 -0 0</wrench>
+          <acceleration>0 -0 -0 2e-06 1e-06 0</acceleration>
+          <wrench>0 -0 -0 0 -0 0</wrench>
+        </link>
+      </model>
+      <model name='cube_marker_1'>
+        <pose frame=''>0.14395 0.563914 0.497637 -0.005558 -0 -1.49398</pose>
+        <scale>1 1 1</scale>
+        <link name='link'>
+          <pose frame=''>0.14395 0.563914 0.497637 -0.005558 -0 -1.49398</pose>
+          <velocity>0 0 0 0 -0 0</velocity>
+          <acceleration>-2e-06 -0 -1e-06 1e-06 -1.7e-05 -0</acceleration>
+          <wrench>-0 -0 -0 0 -0 0</wrench>
         </link>
       </model>
       <model name='ground_plane'>
@@ -135,7 +145,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>0.921912 -0.409973 1.94467 0 0.9338 2.31542</pose>
+        <pose frame=''>0.470572 -0.182289 2.17976 -0 1.1458 1.86742</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>
@@ -158,7 +168,7 @@
           <pose frame=''>0 0 0 0 -0 0</pose>
           <geometry>
             <box>
-              <size>0.05 0.05 0.2</size>
+              <size>0.05 0.05 0.1</size>
             </box>
           </geometry>
           <surface>
@@ -189,7 +199,7 @@
           <geometry>
             <mesh>
               <uri>model://cube_marker/meshes/cube_marker_5cm.dae</uri>
-              <scale>1 1 4</scale>
+              <scale>1 1 2</scale>
             </mesh>
           </geometry>
         </visual>
@@ -202,10 +212,10 @@
         <gravity>1</gravity>
         <enable_wind>0</enable_wind>
       </link>
-      <pose frame=''>0.316149 0.672598 0 0 -0 0</pose>
+      <pose frame=''>0.058624 0.74095 0 0 -0 0</pose>
     </model>
     <model name='box'>
-      <pose frame=''>0.131558 0.740843 0.2 0 -0 0</pose>
+      <pose frame=''>0.430134 0.54835 0.2 0 -0 0</pose>
       <static>1</static>
       <link name='link'>
         <inertial>
@@ -258,7 +268,7 @@
       </link>
     </model>
     <model name='box_0'>
-      <pose frame=''>-0.497258 0.008904 0.2 0 -0 0</pose>
+      <pose frame=''>-0.51007 -0.05799 0.2 0 -0 0</pose>
       <static>1</static>
       <link name='link'>
         <inertial>
@@ -309,6 +319,70 @@
         <enable_wind>0</enable_wind>
         <kinematic>0</kinematic>
       </link>
+    </model>
+    <model name='cube_marker_1'>
+      <static>0</static>
+      <link name='link'>
+        <inertial>
+          <mass>0.05</mass>
+          <inertia>
+            <ixx>5.2083e-05</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>5.2083e-05</iyy>
+            <iyz>0</iyz>
+            <izz>2.0833e-05</izz>
+          </inertia>
+        </inertial>
+        <collision name='colision'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <box>
+              <size>0.05 0.05 0.2</size>
+            </box>
+          </geometry>
+          <surface>
+            <friction>
+              <ode>
+                <mu>30</mu>
+                <mu2>30</mu2>
+                <fdir1>0 0 0</fdir1>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+            </friction>
+            <contact>
+              <ode>
+                <kp>1e+06</kp>
+                <kd>100</kd>
+                <min_depth>0.0025</min_depth>
+                <max_vel>1</max_vel>
+              </ode>
+            </contact>
+            <bounce/>
+          </surface>
+          <max_contacts>10</max_contacts>
+        </collision>
+        <visual name='visual1'>
+          <pose frame=''>0 0 0 0 -0 0</pose>
+          <geometry>
+            <mesh>
+              <uri>model://cube_marker_1/meshes/cube_marker_5cm.dae</uri>
+              <scale>1 1 4</scale>
+            </mesh>
+          </geometry>
+        </visual>
+        <velocity_decay>
+          <linear>0</linear>
+          <angular>0</angular>
+        </velocity_decay>
+        <self_collide>0</self_collide>
+        <kinematic>0</kinematic>
+        <gravity>1</gravity>
+        <enable_wind>0</enable_wind>
+      </link>
+      <pose frame=''>-0.018821 1.06654 0 0 -0 0</pose>
     </model>
   </world>
 </sdf>
