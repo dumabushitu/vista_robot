@@ -4,15 +4,14 @@
 
 该功能包使用了ur3机械臂和robotiq作为其末端执行器。搭建了urdf模型及其仿真环境，进行了moveit配置，同时使用了ar_track_alvar用于识别ar标签进行pick和place实验。
 
-![抓取第一个物块](./media/pickdemo1.png "抓取第一个物块")
-![抓取第二个物块](./media/pickdemo2.png "抓取第二个物块")
-
+<img src="https://github.com/dumabuhitu/vista_robot/raw/master/media/pickdemo1.gif" width="400">
+<img src="https://github.com/dumabuhitu/vista_robot/raw/master/media/pickdemo2.gif" width="400">
 
 仿真环境里识别精度：通过比较gazebo里实际立方体的位置和rviz里经过tf变换得到的位置，识别误差在1mm以内。
 pick and place进行了两种方案，对于20cm高立方体采用从侧面抓取，对于10cm立方体采用从上方抓取，c++代码rviz里演示成功，但是gazebo里抓取物块时，物块会抖动或者脱落，设置有摩擦，未找到解决方法。
 
-![抓取第一个物块](./media/gazebodemo1.png "抓取第一个物块")
-![抓取第二个物块](./media/gazebodemo2.png "抓取第二个物块")
+<img src="https://github.com/dumabuhitu/vista_robot/raw/master/media/gazebodemo1.gif" width="400">
+<img src="https://github.com/dumabuhitu/vista_robot/raw/master/media/gazebodemo2.gif" width="400">
 
 python版本进行pick时，在机械臂末端绑定了立方体后会报错
 ```
@@ -40,15 +39,6 @@ roslaunch vistar_moveit_config vistar_moveit_planning_execution.launch
 
 ​3.进行抓取放置
 
--  c++
 ```
 rosrun pick_and_place pick_place_node
 ```
-- python
-
-```
-rosrun pick_and_place pick_place_10cm.py
-```
-
-
-

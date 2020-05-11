@@ -164,8 +164,8 @@ void place(moveit::planning_interface::MoveGroupInterface& group,const geometry_
   }
   else{
     place_location[0].post_place_retreat.direction.vector.z = 1.0;
-    place_location[0].post_place_retreat.min_distance = 0.1;
-    place_location[0].post_place_retreat.desired_distance = 0.25;
+    place_location[0].post_place_retreat.min_distance = 0.08;
+    place_location[0].post_place_retreat.desired_distance = 0.15;
   }
 
   //设置放置对象完成后机械爪的状态
