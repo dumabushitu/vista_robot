@@ -4,14 +4,14 @@
 
 该功能包使用了ur3机械臂和robotiq作为其末端执行器。搭建了urdf模型及其仿真环境，进行了moveit配置，同时使用了ar_track_alvar用于识别ar标签进行pick和place实验。
 
-<img src="https://github.com/dumabushitu/vista_robot/blob/master/media/pickdemo1.png" width="400">
-<img src="https://github.com/dumabushitu/vista_robot/blob/master/media/pickdemo2.png" width="400">
+![demo1](https://github.com/dumabushitu/vista_robot/blob/master/media/pickdemo1.png)
+![demo2](https://github.com/dumabushitu/vista_robot/blob/master/media/pickdemo2.png)
 
 仿真环境里识别精度：通过比较gazebo里实际立方体的位置和rviz里经过tf变换得到的位置，识别误差在1mm以内。
 pick and place进行了两种方案，对于20cm高立方体采用从侧面抓取，对于10cm立方体采用从上方抓取，c++代码rviz里演示成功，但是gazebo里抓取物块时，物块会抖动或者脱落，设置有摩擦，未找到解决方法。
 
-<img src="https://github.com/dumabushitu/vista_robot/blob/master/media/gazebodemo1.png" width="400">
-<img src="https://github.com/dumabushitu/vista_robot/blob/master/media/gazebodemo2.png" width="400">
+![demo1](https://github.com/dumabushitu/vista_robot/blob/master/media/gazebodemo1.png)
+![demo2](https://github.com/dumabushitu/vista_robot/blob/master/media/gazebodemo2.png)
 
 python版本进行pick时，在机械臂末端绑定了立方体后会报错
 ```
