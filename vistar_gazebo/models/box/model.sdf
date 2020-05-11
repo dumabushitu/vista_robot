@@ -1,0 +1,41 @@
+<?xml version='1.0'?>
+<sdf version="1.4">
+  <model name="box">
+    <pose>0 0 0.2 0 0 0</pose>
+    <static>true</static>
+    <link name="link">
+      <inertial>
+        <mass>1.0</mass>
+        <inertia> <!-- inertias are tricky to compute -->
+          <!-- http://gazebosim.org/tutorials?tut=inertia&cat=build_robot -->
+          <ixx>0.0166</ixx>       <!-- for a box: ixx = 0.083 * mass * (y*y + z*z) -->
+          <ixy>0.0</ixy>         
+          <ixz>0.0</ixz>         
+          <iyy>0.02656</iyy>       
+          <iyz>0.0</iyz>         
+          <izz>0.0166</izz>       
+        </inertia>
+      </inertial>
+      <collision name="collision">
+        <geometry>
+          <box>
+            <size>0.4 0.2 0.4</size>
+          </box>
+        </geometry>
+      </collision>
+      <visual name="visual">
+        <geometry>
+          <box>
+            <size>0.4 0.2 0.4</size>
+          </box>
+        </geometry>
+        <material>
+          <ambient>0.937 0.161 0.161 1</ambient>
+          <diffuse>0.937 0.161 0.161 1</diffuse>
+          <specular>0 0 0 0</specular>
+          <emissive>0 0 0 1</emissive>
+        </material>
+      </visual>
+    </link>
+  </model>
+</sdf>
